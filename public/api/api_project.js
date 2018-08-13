@@ -1,0 +1,20 @@
+define({
+  "name": "小萌商城API",
+  "version": "0.0.1",
+  "description": "小萌商城API",
+  "title": "Custom apiDoc browser title",
+  "url": "https://wxapp.honeybot.cn/api",
+  "sampleUrl": "https://wxapp.honeybot.cn/api",
+  "template": {
+    "withCompare": true,
+    "withGenerator": true
+  },
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2018-08-05T10:22:51.340Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.6"
+  }
+});
