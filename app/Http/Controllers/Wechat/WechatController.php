@@ -27,7 +27,7 @@ class WechatController extends Controller
         $client = Client::where('open_id',$openId)->first();
         if (!$client){
             $newUser = [
-                'union_id' => $decryptedData['unionId'],
+                'union_id' => '',
                 'nick_name' => $decryptedData['nickName'],
                 'password' => bcrypt("admin123"),
                 'avatar_url' => $decryptedData['avatarUrl'],
