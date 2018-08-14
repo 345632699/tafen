@@ -30,7 +30,7 @@ class AuthController extends BaseController
     public function authenticate(Request $request)
     {
         $payload = [
-            'union_id' => $request->get('union_id'),
+            'open_id' => $request->get('open_id'),
             'password' => "admin123"
         ];
         try {
@@ -49,7 +49,7 @@ class AuthController extends BaseController
     public function register(Request $request)
     {
         $newUser = [
-            'union_id' => $request->get('union_id'),
+            'open_id' => $request->get('open_id'),
             'name' => $request->get('name'),
             'password' => bcrypt("admin123"),
             'avatar_url' => bcrypt("admin123")

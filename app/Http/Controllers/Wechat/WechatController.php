@@ -22,9 +22,9 @@ class WechatController extends Controller
         $res = $app->auth->session($code);
         $decryptedData = $app->encryptor->decryptData($res['session_key'], $iv, $encryptedData);
 
-        $union_id = $decryptedData['unionId'];
+        $openId = $decryptedData['openId'];
 
-        $client = Client::where('union_id',$union_id)->first();
+        $client = Client::where('open_id',$openId)->first();
         if (!$client){
             $newUser = [
                 'union_id' => $decryptedData['unionId'],

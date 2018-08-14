@@ -30,6 +30,6 @@ class Client extends Authenticatable
   }
 
   protected $hidden = [
-    'password','union_id'
+    'password','union_id','open_id'
   ];
 }
