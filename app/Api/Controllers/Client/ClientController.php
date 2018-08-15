@@ -24,7 +24,39 @@ class ClientController extends BaseController
      * @apiName 用户详情
      * @apiGroup Client
      *
-     * @apiHeader (Authorization) {String} authorization Authorization value.
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     *   * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          {
+     *               "response": {
+     *                   "data": {
+     *                       "nick_name": "Cyu",
+     *                       "phone_num": null,
+     *                       "avatar_url": "https://wx.qlogo.cn/mmopen/vi_32/TQRoibX72mRzib5Uf1Kk2uRuPQNsthc6p1JIQibEHQcHWQiaoTkzpJOrf4dnYAeicic4X3k12skIUSJEWEbeINfDGmWg/132",
+     *                       "amount": null,
+     *                       "freezing_amount": null,
+     *                       "default_address_id": {
+     *                           "uid": 80,
+     *                           "client_id": 13,
+     *                           "name": "蔡诗茵",
+     *                           "phone_num": 13415398357,
+     *                           "province": "广东省",
+     *                           "city": "深圳市",
+     *                           "area": "盐田区",
+     *                           "address": "盐田区有很多盐和田的一个区没有去过盐田区这是一个很长很长的地址长到要换行行行",
+     *                           "default_flag": "Y",
+     *                           "created_at": "2018-08-06 02:23:39",
+     *                           "updated_at": "2018-08-15 04:33:48"
+     *                       },
+     *                       "wait_pay": 5
+     *                   },
+     *                   "status": 1,
+     *                   "msg": "success"
+     *               }
+     *           }
+     *     }
      *
      */
     public function index() {
@@ -53,14 +85,6 @@ class ClientController extends BaseController
 
     }
 
-    /**
-     * @api {get} /client/check 是否绑定机器人
-     * @apiName 是否绑定机器人
-     * @apiGroup Client
-     *
-     * @apiHeader (Authorization) {String} authorization Authorization value.
-     *
-     */
     public function checkBind(){
         $client_id = $this->client->getUserByOpenId()->id;
         $result = $this->client->checkBind($client_id);
