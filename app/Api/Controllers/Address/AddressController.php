@@ -25,6 +25,8 @@ class AddressController extends BaseController
      * @apiHeader (Authorization) {String} authorization Authorization value.
      *
      * @apiParam {int} goods_id 商品id
+     * @apiParam {int} limit 分页条数
+     * @apiParam {int} page 分页页码
      *
      * @apiSuccess {Array} data 返回的数据结构体
      * @apiSuccess {Number} status  1 执行成功 0 为执行失败
@@ -33,6 +35,40 @@ class AddressController extends BaseController
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
+     *          {
+     *           "response": {
+     *               "data": {
+     *                   "address_list": {
+     *                   "current_page": 1,
+     *                   "data": [
+     *                       {
+     *                           "uid": 80,
+     *                           "client_id": 13,
+     *                           "name": "蔡诗茵",
+     *                           "phone_num": 13415398357,
+     *                           "province": "广东省",
+     *                           "city": "深圳市",
+     *                           "area": "盐田区",
+     *                           "address": "盐田区有很多盐和田的一个区没有去过盐田区这是一个很长很长的地址长到要换行行行",
+     *                           "default_flag": "Y",
+     *                           "created_at": "2018-08-06 02:23:39",
+     *                           "updated_at": "2018-08-15 04:33:48"
+     *                       }
+     *                   ],
+     *                   "from": 1,
+     *                   "last_page": 1,
+     *                   "next_page_url": null,
+     *                   "path": "https://dj.mqphp.com/api/address/list",
+     *                   "per_page": "100",
+     *                   "prev_page_url": null,
+     *                   "to": 1,
+     *                   "total": 1
+     *               }
+     *               },
+     *               "status": 1,
+     *               "msg": "success"
+     *               }
+     *           }
      *     }
      *
      */
