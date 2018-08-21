@@ -25,14 +25,17 @@ class GoodRepository implements GoodRepositoryInterface
             $goods = Good::select("goods.*")
                 ->where('goods.uid',$good_id)
                 ->first();
-            $goods->combo_list = \DB::table('good_combos')
-                ->select('uid','name','unit_price','original_unit_price')
+            $attrList = \DB::table('attr_good_mapping as agm')
+                ->select('agm.*','attr.name','attr.description')
+                ->leftJoin('attributes as attr','attr.id','=','agm.attr_id')
                 ->where('good_id',$good_id)
-                ->get()->toArray();
-            $goods->color_list = \DB::table('good_colors')
-                ->select('uid','name')
-                ->where('good_id',$good_id)
-                ->get()->toArray();
+                ->get();
+            $attrRes = [];
+            foreach ($attrList as $attr) {
+                $attrRes[$attr->attr_id]['attr_list'][] = $attr;
+                $attrRes[$attr->attr_id]['name'] = $attrRes[$attr->attr_id]['attr_list'][0]->name;
+            }
+            $goods->attr = array_values($attrRes);
             $goods->detail_imgs = \DB::table('good_details')
                 ->select("url")
                 ->where('good_id',$good_id)

@@ -34,6 +34,10 @@ $api->version('v1', function ($api) {
 
         //商品路由
         $api->get('good','Goods\GoodController@index');
+        //商品分类列表
+        $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
+        //首页路由
+        $api->get('home','Home\HomeController@index');
         //支付回调
         $api->any('pay/notify','Pay\PayController@payNotify');
 
@@ -64,5 +68,7 @@ $api->version('v1', function ($api) {
             //提现
             $api->post('pay/withdraw','Pay\PayController@withdraw');
         });
+
+
     });
 });

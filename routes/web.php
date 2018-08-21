@@ -33,5 +33,8 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 Route::any('getUnionId','Wechat\WechatController@mini');
+Route::any('home','\App\Api\Controllers\Home\HomeController@index');
+Route::any('category_gppds','\App\Api\Controllers\Goods\GoodController@categoryGoodsList');
+Route::any('good_detail','\App\Api\Controllers\Goods\GoodController@index');
 
 
