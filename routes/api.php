@@ -32,10 +32,8 @@ $api->version('v1', function ($api) {
             $api->post('user/me', 'AuthController@AuthenticatedUser'); //根据
         });
 
-        //商品路由
-        $api->get('good','Goods\GoodController@index');
-        //商品分类列表
-        $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
+
+
         //首页路由
         $api->get('home','Home\HomeController@index');
         //支付回调
@@ -67,6 +65,11 @@ $api->version('v1', function ($api) {
             $api->post('pay/withdraw_list','Pay\PayController@getWithDrawRecordList');
             //提现
             $api->post('pay/withdraw','Pay\PayController@withdraw');
+
+            //商品路由
+            $api->get('good','Goods\GoodController@index');
+            //商品分类列表
+            $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
         });
 
 

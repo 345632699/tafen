@@ -4,6 +4,7 @@ namespace App\Api\Controllers\Goods;
 
 use App\Api\Controllers\BaseController;
 use App\Model\Category;
+use App\Model\Client;
 use App\Model\Good;
 use App\Repositories\Good\GoodRepository;
 use Illuminate\Http\Request;
@@ -21,14 +22,17 @@ class GoodController extends BaseController
      * @apiName 获取商品详情
      * @apiGroup Good
      *
-     * @apiSuccess {float} unit_price 商城价格 折后价格
-     * @apiSuccess {float} original_unit_price 原价格
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     * @apiSuccess {float} unit_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在
+     * @apiSuccess {float} original_unit_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格
      * @apiSuccess {int} stock 库存
      * @apiSuccess {int} already_sold 已销售数量
      * @apiSuccess {int} category_id 分类ID
      * @apiSuccess {int} is_onsale 是否上家
      * @apiSuccess {int} is_new 是否是新品
      * @apiSuccess {int} is_hot 是否热卖
+     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价
      * @apiSuccess {float} delivery_fee 运费
      * @apiSuccess {int} is_coupon 是否是优惠专区的商品
      * @apiSuccess {int} thumbnail_img 商品缩略图
@@ -58,6 +62,7 @@ class GoodController extends BaseController
     "is_onsale": 1,
     "is_new": 0,
     "is_hot": 0,
+    "is_agent_type": 0,
     "is_agent_type": 0,
     "agent_type_id": 0,
     "delivery_fee": 0,
@@ -153,6 +158,9 @@ class GoodController extends BaseController
      * @apiName 获取分类商品列表
      * @apiGroup Good
      *
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     *
      * @apiParam {int} cat_id 分类ID
      * @apiParam {int} limit 分页条数
      * @apiParam {int} page 页码
@@ -164,8 +172,8 @@ class GoodController extends BaseController
      * @apiSuccess {int} total 记录总数
      * @apiSuccess {int} last_page 最后的页码
      * @apiSuccess {int} per_page 每页显示条数 默认5 可以通过传limit改变
-     * @apiSuccess {float} unit_price 商城价格 折后价格
-     * @apiSuccess {float} original_unit_price 原价格
+     * @apiSuccess {float} unit_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在
+     * @apiSuccess {float} original_unit_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格
      * @apiSuccess {int} stock 库存
      * @apiSuccess {int} already_sold 已销售数量
      * @apiSuccess {int} category_id 分类ID
@@ -174,6 +182,7 @@ class GoodController extends BaseController
      * @apiSuccess {int} is_hot 是否热卖
      * @apiSuccess {float} delivery_fee 运费
      * @apiSuccess {int} is_coupon 是否是优惠专区的商品
+     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价
      * @apiSuccess {int} thumbnail_img 商品缩略图
      *
      * @apiSuccess {Array} data 返回机构体
@@ -215,6 +224,7 @@ class GoodController extends BaseController
     "agent_type_id": 0,
     "delivery_fee": 5,
     "is_coupon": 1,
+    "agent_price": null
     "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg"
     }
     ],
@@ -247,8 +257,20 @@ class GoodController extends BaseController
             $where['is_coupon'] = $is_coupon;
         }
         $category = Category::find($cat_id);
-        $good_list = Good::where($where)
-            ->paginate($limit);
+        $good_list = Good::where($where)->paginate(10);;
+        foreach($good_list as $good){
+            //代理价格
+            $client_id = session('client.id');
+            if ($client_id) {
+                $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
+                    ->where('clients.id',$client_id)->first();
+                if(isset($res->discount_rate) && $good->is_coupon <= 0){
+                    $good->agent_price = number_format($good->original_unit_price * (100 - $res->discount_rate) / 100,2);
+                }else{
+                    $good->agent_price = null;
+                }
+            }
+        }
         $resData['category'] = $category;
         $resData['good_list'] = $good_list;
         return response_format($resData);

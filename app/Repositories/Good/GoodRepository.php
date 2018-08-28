@@ -9,6 +9,7 @@
 namespace App\Repositories\Good;
 
 
+use App\Client;
 use App\Model\Good;
 
 class GoodRepository implements GoodRepositoryInterface
@@ -31,6 +32,17 @@ class GoodRepository implements GoodRepositoryInterface
                 ->where('good_id',$good_id)
                 ->get();
             $attrRes = [];
+            //代理价格
+            $client_id = session('client.id');
+            if ($client_id) {
+                $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
+                                    ->where('clients.id',$client_id)->first();
+                if(isset($res->discount_rate) && $goods->is_coupon <= 0){
+                    $goods->agent_price = number_format($goods->original_unit_price * (100 - $res->discount_rate) / 100,2);
+                }else{
+                    $goods->agent_price = null;
+                }
+            }
             foreach ($attrList as $attr) {
                 $attrRes[$attr->attr_id]['attr_list'][] = $attr;
                 $attrRes[$attr->attr_id]['name'] = $attrRes[$attr->attr_id]['attr_list'][0]->name;
