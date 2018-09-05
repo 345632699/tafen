@@ -26,4 +26,6 @@ interface ClientRepositoryInterface {
     public function updateTreeNode($client_id,$parent_id);
 
     public function checkBind($client_id);
+
+    public function getAgentRate($client_id);
 }

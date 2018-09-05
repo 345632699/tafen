@@ -32,9 +32,12 @@ class OrderRepository implements OrderRepositoryInterface
     public function createOrderHeader($request,$client_id)
     {
         $order_header_data['client_id'] = $client_id;
-        $order_header_data['contract_id'] = $request->address_id;
         $order_header_data['order_number'] = config('wechat.payment.default.mch_id').time();
         $order_header_data['order_date'] = Carbon::now();
+        $order_header_data['pay_name'] = $request->get('pay_name','微信支付');
+        $order_header_data['pay_type'] = $request->get('pay_type','1');
+        $order_header_data['expired_time'] = Carbon::now()->addMinutes(30);
+        $order_header_data['shipping_fee'] = $request->get('shipping_fee','0');
         $order_header_data['open_invoice_flag'] = $request->get('open_invoice_flag','N');
         $order_header = Order::create($order_header_data);
         return $order_header;
@@ -43,22 +46,47 @@ class OrderRepository implements OrderRepositoryInterface
     public function createOrderLine($order_header_id,$request,$parent_id)
     {
         $client_id = session('client.id');
-        $has_bind_robot = $this->client->checkBind($client_id);
-        $combo_id = $request->get('combo_id',1);
-        $combo = \DB::table("good_combos")->where('uid',$combo_id)->first();
         $order_line_data['header_id'] = $order_header_id;
         $order_line_data['good_id'] = $request->get('good_id',1);
-        if(!$has_bind_robot && $parent_id > 0){
-            $price = $combo->unit_price;
-        }else{
-            $price = $combo->original_unit_price;
-        }
-        $order_line_data['color'] = $request->get('color',"白色");
-        $order_line_data['combo_id'] = $combo_id;
+        $good = DB::table('goods')->where('uid',$order_line_data['good_id'])->first();
         $order_line_data['buyer_msg'] = $request->get('buyer_msg',"");
         $order_line_data['quantity'] = $request->get('quantity',1);
-        $order_line_data['unit_price'] = $price;
-        $order_line_data['total_price'] = $price * $order_line_data['quantity'];
+        $order_line_data['original_price'] = $good->original_price;
+        $order_line_data['discount_price'] = $good->discount_price;
+        $order_line_data['attr_good_mapping_id'] = $request->get('attr_good_mapping_id','');
+        $agentRate = $this->client->getAgentRate($client_id);
+        $order_line_data['agent_price'] = $good->original_price * $agentRate / 100;
+        if ($good->is_coupon) {
+            $order_line_data['last_price'] =  $order_line_data['discount_price'];
+        }else{
+            $order_line_data['last_price'] =  $order_line_data['agent_price'];
+        }
+        $order_line_data['total_price'] = $order_line_data['last_price'] * $order_line_data['quantity'];
+        $contract = Contact::find($request->get('address_id'));
+        $order_line_data['address'] = '';
+        if ($contract){
+            $order_line_data['address'] = $contract->name . ' ' . $contract->province.$contract->city.$contract->area.$contract->address . " " .$contract->phone_num;
+        }
+        $order_line = OrderDetail::create($order_line_data);
+        return $order_line;
+    }
+
+    public function createOrderLineFromCart($order_header_id,$cart,$address_id){
+        $order_line_data['header_id'] = $order_header_id;
+        $order_line_data['good_id'] = $cart->good_id;
+        $order_line_data['buyer_msg'] = '';
+        $order_line_data['quantity'] = $cart->number;
+        $order_line_data['attr_good_mapping_id'] = $cart->attr_good_mapping_id;
+        $order_line_data['original_price'] = $cart->original_price;
+        $order_line_data['discount_price'] = $cart->discount_price;
+        $order_line_data['agent_price'] = $cart->agent_price;
+        $order_line_data['last_price'] =  $cart->last_price;
+        $order_line_data['total_price'] = $cart->total_price;
+        $contract = Contact::find($address_id);
+        $order_line_data['address'] = '';
+        if ($contract){
+            $order_line_data['address'] = $contract->name . ' ' . $contract->province.$contract->city.$contract->area.$contract->address . " " .$contract->phone_num;
+        }
         $order_line = OrderDetail::create($order_line_data);
         return $order_line;
     }

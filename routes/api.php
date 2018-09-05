@@ -50,8 +50,14 @@ $api->version('v1', function ($api) {
             $api->get('order/list','Order\OrderController@getOrderList');
             $api->get('order/get','Order\OrderController@get');
             $api->post('order/create','Order\OrderController@create');
+            $api->post('order/cart','Order\OrderController@createFromCart'); //购物车选中下单
+            $api->post('order/wxpaysdk','Order\OrderController@getWxPayConfig'); // 获取微信支付SDK
             $api->post('order/confirm','Order\OrderController@confirmReceipt');
             $api->post('order/cancel','Order\OrderController@cancelOrder');
+
+            $api->post('cart/create','Cart\CartController@addToCart');
+            $api->post('cart/update','Cart\CartController@updateCart');
+            $api->post('cart/delete','Cart\CartController@deleteCart');
 
         });
 

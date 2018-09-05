@@ -3,18 +3,21 @@
 namespace App\Api\Controllers\Goods;
 
 use App\Api\Controllers\BaseController;
+use App\Model\Attribute;
 use App\Model\Category;
 use App\Model\Client;
 use App\Model\Good;
+use App\Repositories\Client\ClientRepository;
 use App\Repositories\Good\GoodRepository;
 use Illuminate\Http\Request;
 use Mockery\Exception;
 
 class GoodController extends BaseController
 {
-    public function __construct(GoodRepository $goods)
+    public function __construct(GoodRepository $goods,ClientRepository $client)
     {
         $this->goods = $goods;
+        $this->client = $client;
     }
 
     /**
@@ -24,19 +27,20 @@ class GoodController extends BaseController
      *
      * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
      *
-     * @apiSuccess {float} unit_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在
-     * @apiSuccess {float} original_unit_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格
-     * @apiSuccess {int} stock 库存
-     * @apiSuccess {int} already_sold 已销售数量
+     * @apiSuccess {float} discount_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {float} original_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {float} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {float} last_price 最终用于支付的价格 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {int} stock 库存 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {int} already_sold 已销售数量 (选择规格时，以规格中的属性价格为准)
      * @apiSuccess {int} category_id 分类ID
      * @apiSuccess {int} is_onsale 是否上家
      * @apiSuccess {int} is_new 是否是新品
      * @apiSuccess {int} is_hot 是否热卖
-     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价
      * @apiSuccess {float} delivery_fee 运费
      * @apiSuccess {int} is_coupon 是否是优惠专区的商品
      * @apiSuccess {int} thumbnail_img 商品缩略图
-     * @apiSuccess {Array} attr 商品属性
+     * @apiSuccess {Array} attributes 商品属性
      * @apiSuccess {Array} detail_imgs 详情图片
      * @apiSuccess {Array} detail_imgs 详情图片
      * @apiSuccess {banner_imgs} detail_imgs bannerr轮播图片
@@ -52,79 +56,81 @@ class GoodController extends BaseController
     "uid": 1,
     "name": "她芬美国甜橙精油 100ml",
     "description": "好眠 健脾胃 开心喜悦",
-    "unit_price": 131,
-    "original_unit_price": 131,
+    "discount_price": null,
+    "original_price": 131,
     "stock": 280,
     "already_sold": 2143,
     "combos_id": 0,
-    "update_time": "2018-08-20 14:53:34",
+    "update_time": "2018-09-05 08:22:11",
     "category_id": 2,
     "is_onsale": 1,
     "is_new": 0,
     "is_hot": 0,
     "is_agent_type": 0,
-    "is_agent_type": 0,
     "agent_type_id": 0,
     "delivery_fee": 0,
     "is_coupon": 0,
     "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
-    "attr": [
+    "attribute_id": "2",
+    "agent_price": "104.80",
+    "last_price": "26.20",
+    "attributes": {
+    "name": "规格",
+    "list": [
     {
-    "attr_list": [
-    {
+    "title": "规格",
     "id": 1,
     "attr_id": 2,
     "good_id": 1,
-    "name": "规格",
-    "price": 200,
+    "name": "100ml",
+    "original_price": 200,
     "stock": 100,
-    "description": "精油及肥皂的规格"
+    "discount_price": null,
+    "is_coupon": null,
+    "agent_price": "40.00",
+    "last_price": "40.00"
     },
     {
+    "title": "规格",
     "id": 2,
     "attr_id": 2,
     "good_id": 1,
-    "name": "规格",
-    "price": 300,
+    "name": "200ml",
+    "original_price": 300,
     "stock": 200,
-    "description": "精油及肥皂的规格"
+    "discount_price": null,
+    "is_coupon": null,
+    "agent_price": "60.00",
+    "last_price": "60.00"
     },
     {
+    "title": "规格",
     "id": 3,
     "attr_id": 2,
     "good_id": 1,
-    "name": "规格",
-    "price": 400,
+    "name": "300ml",
+    "original_price": 400,
     "stock": 300,
-    "description": "精油及肥皂的规格"
+    "discount_price": null,
+    "is_coupon": null,
+    "agent_price": "80.00",
+    "last_price": "80.00"
     },
     {
+    "title": "规格",
     "id": 4,
     "attr_id": 2,
     "good_id": 1,
-    "name": "规格",
-    "price": 500,
+    "name": "500ml",
+    "original_price": 500,
     "stock": 400,
-    "description": "精油及肥皂的规格"
+    "discount_price": null,
+    "is_coupon": null,
+    "agent_price": "100.00",
+    "last_price": "100.00"
     }
-    ],
-    "name": "规格"
+    ]
     },
-    {
-    "attr_list": [
-    {
-    "id": 5,
-    "attr_id": 1,
-    "good_id": 1,
-    "name": "套餐",
-    "price": 100,
-    "stock": 100,
-    "description": null
-    }
-    ],
-    "name": "套餐"
-    }
-    ],
     "detail_imgs": [
     "https://img.alicdn.com/imgextra/i2/125331858/TB2IC6EcW9I.eBjy0FeXXXqwFXa_!!125331858.jpg",
     "https://img.alicdn.com/imgextra/i2/125331858/TB2dqHZcYOJ.eBjy1XaXXbNupXa_!!125331858.jpg",
@@ -145,7 +151,6 @@ class GoodController extends BaseController
     "msg": "success"
     }
     }
-     *
      */
     public function index(Request $request) {
         $good_id = $request->get('good_id',1);
@@ -172,19 +177,19 @@ class GoodController extends BaseController
      * @apiSuccess {int} total 记录总数
      * @apiSuccess {int} last_page 最后的页码
      * @apiSuccess {int} per_page 每页显示条数 默认5 可以通过传limit改变
-     * @apiSuccess {float} unit_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在
-     * @apiSuccess {float} original_unit_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格
-     * @apiSuccess {int} stock 库存
-     * @apiSuccess {int} already_sold 已销售数量
+     * @apiSuccess {float} discount_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {float} original_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} last_price 最后计算价格 实际用于支付使用的价格 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} stock 库存 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {int} already_sold 已销售数量 (选择规格时，以规格中的属性价格为准)
      * @apiSuccess {int} category_id 分类ID
      * @apiSuccess {int} is_onsale 是否上家
      * @apiSuccess {int} is_new 是否是新品
      * @apiSuccess {int} is_hot 是否热卖
      * @apiSuccess {float} delivery_fee 运费
      * @apiSuccess {int} is_coupon 是否是优惠专区的商品
-     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价
      * @apiSuccess {int} thumbnail_img 商品缩略图
-     *
      * @apiSuccess {Array} data 返回机构体
      * @apiSuccess {Number} status  1 执行成功 0 为执行失败
      * @apiSuccess {string} msg 执行信息提示
@@ -210,12 +215,12 @@ class GoodController extends BaseController
     "uid": 2,
     "name": "她芬优惠产品",
     "description": "测试用例",
-    "unit_price": 130,
-    "original_unit_price": 128,
+    "discount_price": 80,
+    "original_price": 130,
     "stock": 300,
     "already_sold": 12121,
     "combos_id": 0,
-    "update_time": null,
+    "update_time": "2018-09-05 08:22:12",
     "category_id": 1,
     "is_onsale": 1,
     "is_new": 0,
@@ -224,15 +229,35 @@ class GoodController extends BaseController
     "agent_type_id": 0,
     "delivery_fee": 5,
     "is_coupon": 1,
-    "agent_price": null
-    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg"
+    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+    "attribute_id": "1",
+    "agent_price": null,
+    "last_price": 80,
+    "attributes": {
+    "name": "套餐",
+    "list": [
+    {
+    "title": "套餐",
+    "id": 5,
+    "attr_id": 1,
+    "good_id": 1,
+    "name": "test",
+    "original_price": 100,
+    "stock": 100,
+    "discount_price": null,
+    "is_coupon": null,
+    "agent_price": "20.00",
+    "last_price": "20.00"
+    }
+    ]
+    }
     }
     ],
     "from": 1,
     "last_page": 1,
     "next_page_url": null,
     "path": "http://www.tafen.com/api/cat_goods",
-    "per_page": 5,
+    "per_page": 10,
     "prev_page_url": null,
     "to": 1,
     "total": 1
@@ -257,17 +282,39 @@ class GoodController extends BaseController
             $where['is_coupon'] = $is_coupon;
         }
         $category = Category::find($cat_id);
-        $good_list = Good::where($where)->paginate(10);;
+        $good_list = Good::where($where)->paginate($limit);
         foreach($good_list as $good){
             //代理价格
             $client_id = session('client.id');
             if ($client_id) {
                 $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
                     ->where('clients.id',$client_id)->first();
+                $rate = $this->client->getAgentRate($client_id);
                 if(isset($res->discount_rate) && $good->is_coupon <= 0){
-                    $good->agent_price = number_format($good->original_unit_price * (100 - $res->discount_rate) / 100,2);
+                    $good->agent_price = ($good->original_price * (100 - $res->discount_rate) / 100);
                 }else{
                     $good->agent_price = null;
+                }
+                if ($good->is_coupon){
+                    $good->last_price = $good->discount_price;
+                }else{
+                    $good->last_price = ($rate * $good->original_price / 100);
+                }
+                $attributes = Attribute::select('attributes.name as title','agm.*')->where('attributes.id',$good->attribute_id)
+                        ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')->get();
+                foreach ($attributes as $item){
+                    $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
+                    if ($item->is_coupon){
+                        $item->last_price = $item->discount_price;
+                    }else{
+                        $item->last_price = ($rate * $item->original_price / 100);
+                    }
+                }
+                if($attributes->count()){
+                    $good->attributes = [
+                        'name'=>$attributes[0]->title,
+                        'list'=>$attributes
+                    ];
                 }
             }
         }

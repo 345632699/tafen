@@ -46,4 +46,6 @@ interface OrderRepositoryInterface {
      * 取消订单
      */
     public function cancel($order_id,$client_id);
+
+    public function createOrderLineFromCart($order_header_id,$cart,$address_id);
 }

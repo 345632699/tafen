@@ -7,6 +7,7 @@
  */
 
 namespace App\Repositories\Client;
+use App\Model\Client;
 use Carbon\Carbon;
 use JWTAuth;
 use Mockery\Exception;
@@ -131,6 +132,17 @@ class ClientRepository implements ClientRepositoryInterface
         $id = \DB::table('client_amount_flow')->insertGetId($record);
         if ($id > 0 ){
             \Log::info($parent_id."冻结金额增加成功，金额为：".$record['amount']);
+        }
+    }
+
+    public function getAgentRate($client_id)
+    {
+        $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
+            ->where('clients.id',$client_id)->first();
+        if(isset($res->discount_rate) ){
+            return $res->discount_rate;
+        }else{
+            return 100;
         }
     }
 }

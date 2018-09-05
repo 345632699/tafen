@@ -11,6 +11,7 @@ namespace App\Repositories\Pay;
 
 use App\Model\Good;
 use App\Model\Order;
+use App\Model\OrderDetail;
 use Carbon\Carbon;
 use EasyWeChat\Payment\Application;
 use Illuminate\Support\Facades\Log;
@@ -37,22 +38,25 @@ class PayRepository implements PayRepositoryInterface
 
     public function createPayBillByOrder($order_header_id, $client,$parent_id)
     {
-        $order = Order::select('order_headers.uid','ol.quantity','ol.unit_price')
-            ->leftJoin('order_lines as ol','ol.header_id','=','order_headers.uid')
-            ->where('order_headers.uid',$order_header_id)
-            ->first();
-        if ($order){
+        $orders = OrderDetail::where('header_id',$order_header_id)->get();
+        $total_price = 0;
+        foreach ($orders as $order){
+            $total_price += $order->total_price;
+        }
+        if ($orders->count()){
             $pay['client_id'] = $client->id;
             $pay['parent_id'] = $parent_id;
-            $pay['order_header_id'] = $order->uid;
+            $pay['order_header_id'] = $order_header_id;
             $pay['pay_order_number'] = config('wechat.payment.default.mch_id').time();
-            $pay['total_price'] = $order->quantity * $order->unit_price * 100;
+            $pay['total_price'] = $total_price;
             $pay['created_at'] = Carbon::now();
             $pay['updated_at'] = Carbon::now();
             $pay_bill_id = \DB::table('pay_bills')->insertGetId($pay);
             if ($pay_bill_id){
                 return $pay;
             }
+        }else{
+
         }
     }
 

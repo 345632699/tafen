@@ -11,11 +11,14 @@ class Cart extends Model
         'client_id',
         'good_id',
         'number',
-        'price',
         'attr_good_mapping_id',
         'original_price',
-        'unit_price',
+        'discount_price',
+        'last_price',
+        'agent_price',
         'total_price',
+        'attribute_name',
+        'shipping_fee',
         'memo'
     ];
 
