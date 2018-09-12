@@ -43,6 +43,91 @@ class OrderController extends BaseController
      * @apiSuccess {Array} data 返回的数据结构体
      * @apiSuccess {Number} status  1 执行成功 0 为执行失败
      * @apiSuccess {string} msg 执行信息提示
+     * @apiSuccess {string} tips 具体参考获取订单列表参数接口文档
+     *
+     * @apiSuccessExample Success-Response:
+     * {
+    "response": {
+    "data": {
+    "uid": 7,
+    "order_number": "15096990811536147816",
+    "order_type": 0,
+    "order_status": 0,
+    "client_id": 16,
+    "order_date": "2018-09-05 11:43:36",
+    "pay_name": "微信支付",
+    "pay_type": 1,
+    "pay_date": null,
+    "completion_date": null,
+    "return_date": null,
+    "request_close_date": null,
+    "open_invoice_flag": "N",
+    "shipping_fee": 5,
+    "expired_time": "2018-09-05 12:13:36",
+    "updated_at": "2018-09-05 11:43:36",
+    "created_at": "2018-09-05 11:43:36",
+    "order_id": 7,
+    "good_list": [
+    {
+    "uid": 9,
+    "header_id": 7,
+    "good_id": 1,
+    "attr_good_mapping_id": 2,
+    "quantity": 2,
+    "buyer_msg": "",
+    "discount_price": null,
+    "total_price": 32,
+    "shipping_status": 0,
+    "shipping_code": null,
+    "shipping_time": null,
+    "taking_time": null,
+    "shipping_name": null,
+    "address": "蔡诗茵 广东省深圳市盐田区盐田区有很多盐和田的一个区没有去过盐田区这是一个很长很长的地址长到要换行行行 13415398357",
+    "updated_at": "2018-09-05 11:43:36",
+    "created_at": "2018-09-05 11:43:36",
+    "last_price": 16,
+    "agent_price": 16,
+    "original_price": 80,
+    "good_name": "她芬精油",
+    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+    "description": "测试用例",
+    "attr_name": "规格",
+    "attr_value": "200ml"
+    },
+    {
+    "uid": 10,
+    "header_id": 7,
+    "good_id": 2,
+    "attr_good_mapping_id": 3,
+    "quantity": 3,
+    "buyer_msg": "",
+    "discount_price": null,
+    "total_price": 240,
+    "shipping_status": 0,
+    "shipping_code": null,
+    "shipping_time": null,
+    "taking_time": null,
+    "shipping_name": null,
+    "address": "蔡诗茵 广东省深圳市盐田区盐田区有很多盐和田的一个区没有去过盐田区这是一个很长很长的地址长到要换行行行 13415398357",
+    "updated_at": "2018-09-05 11:43:36",
+    "created_at": "2018-09-05 11:43:36",
+    "last_price": 80,
+    "agent_price": 80,
+    "original_price": 400,
+    "good_name": "她芬优惠产品",
+    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+    "description": "测试用例",
+    "attr_name": "规格",
+    "attr_value": "300ml"
+    }
+    ],
+    "order_status_name": "未支付",
+    "order_type_name": "微信支付"
+    },
+    "status": 1,
+    "msg": "success"
+    }
+    }
      *
      */
     public function get(Request $request){
@@ -68,25 +153,131 @@ class OrderController extends BaseController
      *
      * @apiParam {int} order_status 0-未支付，1-已支付，2-待发货，3-已发货，4-已完成，5-异常，6-申请退货，7-确认退货，8-已退货 9-已取消 -1 全部
      * @apiParam {int} limit 每页显示条数
+     * @apiParam {int} page 页码
      *
      * @apiSuccess {int} order_id 订单ID
      * @apiSuccess {string} order_number 商品订单
      * @apiSuccess {int} order_type 0-预付款，1-货到付款
      * @apiSuccess {int} order_status ORDER_STATUS：0-已下单，1-已支付，2-待发货，3-已发货，4-已完成，5-异常，6-申请退货，7-确认退货，8-已退货 9-已取消
      * @apiSuccess {datetime} order_date 下单时间
+     * @apiSuccess {int} pay_type 支付方式ID
+     * @apiSuccess {string} pay_name 支付方式名称
      * @apiSuccess {datetime} pay_date 支付时间
-     * @apiSuccess {int} contract_id 收货地址ID
      * @apiSuccess {datetime} completion_date 订单完成时间
      * @apiSuccess {datetime} return_date 退货时间
      * @apiSuccess {datetime} request_close_date 订单关闭日期
      * @apiSuccess {string} open_invoice_flag 是否开发票
+     * @apiSuccess {int} shipping_fee 运费 单位为分
+     * @apiSuccess {datetime} expired_time 订单失效时间
+     * @apiSuccess {Array} good_list 订单包含的商品
      * @apiSuccess {int} good_id 商品id
      * @apiSuccess {string} good_name 商品名称
-     * @apiSuccess {float} total_price 商品总金额
-     * @apiSuccess {float} discount_price 单价
+     * @apiSuccess {string} thumbnail_img 商品缩略图
+     * @apiSuccess {string} description 商品描述
+     * @apiSuccess {string} attr_name 规格属性名称
+     * @apiSuccess {string} attr_value 选中的规格 属性值
+     * @apiSuccess {int} total_price 商品总金额 单位为 分
+     * @apiSuccess {int} discount_price 优惠商品价格 仅当为优惠产品时 字段不为空 单位为 分
+     * @apiSuccess {int} last_price 最终结算 使用的价格 单位为 分
+     * @apiSuccess {int} agent_price 一级代理的价格 单位为 分
+     * @apiSuccess {int} original_price 原价 单位为 分
+     * @apiSuccess {string} address 收件人地址信息 联系方式
      * @apiSuccess {int} quantity 数量
-     * @apiSuccess {string} robot_id 关联机器人ID
+     * @apiSuccess {int} shipping_status 快递状态 0 为未发货 1 已发货
+     * @apiSuccess {string} shipping_name 快递名称
+     * @apiSuccess {string} shipping_code 快递单号
+     * @apiSuccess {string} shipping_time 发货时间
+     * @apiSuccess {string} taking_time 收货时间
      *
+     * @apiSuccessExample Success-Response:
+     * {
+    "response": {
+    "data": {
+    "current_page": 1,
+    "data": [
+    {
+    "uid": 9,
+    "order_number": "15096990811536148127",
+    "order_type": 0,
+    "order_status": 0,
+    "client_id": 16,
+    "order_date": "2018-09-05 11:48:47",
+    "pay_name": "微信支付",
+    "pay_type": 1,
+    "pay_date": null,
+    "completion_date": null,
+    "return_date": null,
+    "request_close_date": null,
+    "open_invoice_flag": "N",
+    "shipping_fee": 5,
+    "expired_time": "2018-09-05 12:18:47",
+    "updated_at": "2018-09-05 11:48:47",
+    "created_at": "2018-09-05 11:48:47",
+    "order_id": 9,
+    "good_list": [
+    {
+    "uid": 11,
+    "header_id": 9,
+    "good_id": 1,
+    "attr_good_mapping_id": 2,
+    "quantity": 1,
+    "buyer_msg": "test",
+    "discount_price": null,
+    "total_price": 26,
+    "shipping_status": 0,
+    "shipping_code": null,
+    "shipping_time": null,
+    "taking_time": null,
+    "shipping_name": null,
+    "address": "蔡诗茵 广东省深圳市盐田区盐田区有很多盐和田的一个区没有去过盐田区这是一个很长很长的地址长到要换行行行 13415398357",
+    "updated_at": "2018-09-05 11:48:47",
+    "created_at": "2018-09-05 11:48:47",
+    "last_price": 26,
+    "agent_price": 26,
+    "original_price": 131,
+    "good_name": "她芬精油",
+    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+    "description": "测试用例",
+    "attr_name": "规格",
+    "attr_value": "200ml"
+    }
+    ]
+    },
+    {
+    "uid": 8,
+    "order_number": "15096990811536148099",
+    "order_type": 0,
+    "order_status": 0,
+    "client_id": 16,
+    "order_date": "2018-09-05 11:48:19",
+    "pay_name": "微信支付",
+    "pay_type": 1,
+    "pay_date": null,
+    "completion_date": null,
+    "return_date": null,
+    "request_close_date": null,
+    "open_invoice_flag": "N",
+    "shipping_fee": 5,
+    "expired_time": "2018-09-05 12:18:19",
+    "updated_at": "2018-09-05 11:48:19",
+    "created_at": "2018-09-05 11:48:19",
+    "order_id": 8,
+    "good_list": []
+    }
+    ],
+    "from": 1,
+    "last_page": 5,
+    "next_page_url": "http://www.tafen.com/api/order/list?page=2",
+    "path": "http://www.tafen.com/api/order/list",
+    "per_page": "2",
+    "prev_page_url": null,
+    "to": 2,
+    "total": 9
+    },
+    "status": 1,
+    "msg": "success"
+    }
+    }
      */
     public function getOrderList(Request $request){
         $order_status = $request->get('order_status',-1);
@@ -362,7 +553,14 @@ class OrderController extends BaseController
      * @apiSuccess {Number} status  1 执行成功 0 为执行失败
      * @apiSuccess {string} msg 执行信息提示
      *
-     *
+     * @apiSuccessExample Success-Response:
+     * {
+    "response": {
+    "data": [],
+    "status": 1,
+    "msg": "success"
+    }
+    }
      */
     public function cancelOrder(Request $request){
         $order_id = intval($request->order_id);
