@@ -6,8 +6,13 @@
                     <div class="panel-heading">Example Component</div>
 
                     <div class="panel-body">
-                        I'm an example component!
+                        I'm an example component!333
                     </div>
+                    <h1>Hello, Larvuent!</h1>
+                    <el-button @click="visible = true">按钮</el-button>
+                    <el-dialog v-model="visible">
+                        <p>欢迎使用 Element</p>
+                    </el-dialog>
                 </div>
             </div>
         </div>
