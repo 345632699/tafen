@@ -301,7 +301,9 @@ class GoodController extends BaseController
                     $good->last_price = ($rate * $good->original_price / 100);
                 }
                 $attributes = Attribute::select('attributes.name as title','agm.*')->where('attributes.id',$good->attribute_id)
-                        ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')->get();
+                        ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')
+                        ->where('agm.good_id',$good->uid)
+                        ->get();
                 foreach ($attributes as $item){
                     $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
                     if ($item->is_coupon){
