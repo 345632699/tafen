@@ -123,8 +123,71 @@ class ClientController extends BaseController
         return response_format($flow_list);
     }
 
-    public function getChild(){
+    /**
+     * @api {get} /api/get_spread_list 获取推广列表
+     * @apiName get_spread_list 获取推广列表
+     * @apiGroup Client
+     *
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     * @apiParam {int} [client_id]  用户ID 默认不传获取个人的推广列表  当传了值后 获取该ID值的用户的推广列表
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *{
+     * "response": {
+     * "data": {
+     * "one": [
+     * {
+     * "id": 17,
+     * "nick_name": "李国聪",
+     * "phone_num": null,
+     * "gender": 1,
+     * "avatar_url": "https://wx.qlogo.cn/mmopen/vi_32/UohvvvhVOpa7giaRmeC3dfgvHNlOuNwydPflMz5E3qVyaAIwNdjves9xUIxiam3WbYK3qAk96c7Of7qYuxYjgsOQ/132",
+     * "updated_at": "2018-09-14 13:37:40",
+     * "created_at": "2018-08-15 03:44:19",
+     * "parent_id": 16,
+     * "agent_type_id": null
+     * }
+     * ],
+     * "two": [
+     * {
+     * "id": 19,
+     * "nick_name": "Mask",
+     * "phone_num": null,
+     * "gender": 1,
+     * "avatar_url": "https://wx.qlogo.cn/mmopen/vi_32/ha3icPy82SgicDsDwxsevGuF44hicNNrCd6We3q71DbuvxOjmVl5ibPbnqP5p24ddBX8QkweQQ8bXVkvibxevicVhJDg/132",
+     * "updated_at": "2018-09-14 13:37:38",
+     * "created_at": "2018-08-17 12:46:46",
+     * "parent_id": 19,
+     * "agent_type_id": null
+     * }
+     * ]
+     * },
+     * "status": 1,
+     * "msg": "success"
+     * }
+     * }
+     */
 
+    public function getChild(Request $request)
+    {
+        $clientId = $this->client->getUserByOpenId()->id;
+        $client_id = $request->get('client_id', $clientId);
+        // 获取下一级的推广人员
+        $oneIds = \DB::table('client_link_treepaths')->select('path_begin_client_id')->where([
+            'path_end_client_id' => $client_id,
+            'dist' => 1
+        ])->get()->pluck('path_begin_client_id')->toArray();
+        $oneChildList = Client::whereIn('id', $oneIds)->get();
+        // 获取二级推广
+        $twoIds = \DB::table('client_link_treepaths')->select('path_begin_client_id')->where([
+            'path_end_client_id' => $client_id,
+            'dist' => 2
+        ])->get()->pluck('path_begin_client_id')->toArray();
+        $twoChildList = Client::whereIn('id', $twoIds)->get();
+        $data['one'] = $oneChildList;
+        $data['two'] = $twoChildList;
+        return response_format($data);
     }
 
 }

@@ -66,6 +66,8 @@ $api->version('v1', function ($api) {
             $api->get('client','Client\ClientController@index');
             $api->get('client/check','Client\ClientController@checkBind');
             $api->get('client/flow_list','Client\ClientController@getFlowList');
+            // 获取推广用户列表
+            $api->get('get_spread_list', 'Client\ClientController@getChild');
 
             //提现记录
             $api->post('pay/withdraw_list','Pay\PayController@getWithDrawRecordList');
@@ -76,6 +78,8 @@ $api->version('v1', function ($api) {
             $api->get('good','Goods\GoodController@index');
             //商品分类列表
             $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
+
+
         });
 
 
