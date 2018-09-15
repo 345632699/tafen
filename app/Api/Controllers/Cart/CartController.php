@@ -241,7 +241,7 @@ class CartController extends BaseController
     {
         $limit = $request->get('limit', 10);
         $client_id = $this->client->getUserByOpenId()->id;
-        $cart_list = Cart::select('carts.*', 'goods.name as good_name', 'goods.description', 'goods.thumbnail_img')->leftJoin('goods', 'good_id', '=', 'uid')->where('client_id', $client_id)->paginate($limit);
+        $cart_list = Cart::select('carts.*', 'goods.name as good_name', 'goods.description', 'goods.thumbnail_img', 'goods.is_coupon')->leftJoin('goods', 'good_id', '=', 'uid')->where('client_id', $client_id)->paginate($limit);
         return response_format($cart_list);
     }
 }
