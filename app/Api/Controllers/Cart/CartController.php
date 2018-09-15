@@ -184,7 +184,7 @@ class CartController extends BaseController
     }
 
     /**
-     * @api {post} /api/cart/cart_list  获取购物车列表
+     * @api {post} /cart/cart_list  获取购物车列表
      * @apiName cart_list
      * @apiGroup Cart
      *
