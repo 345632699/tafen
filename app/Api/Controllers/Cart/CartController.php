@@ -3,6 +3,7 @@
 namespace App\Api\Controllers\Cart;
 
 use App\Api\Controllers\BaseController;
+use App\Client;
 use App\Model\Attribute;
 use App\Model\Cart;
 use App\Model\Good;
@@ -243,5 +244,195 @@ class CartController extends BaseController
         $client_id = $this->client->getUserByOpenId()->id;
         $cart_list = Cart::select('carts.*', 'goods.name as good_name', 'goods.description', 'goods.thumbnail_img', 'goods.is_coupon')->leftJoin('goods', 'good_id', '=', 'uid')->where('client_id', $client_id)->paginate($limit);
         return response_format($cart_list);
+    }
+
+    /**
+     * @api {post} /guessLike  猜你喜欢
+     * @apiName guessLike
+     * @apiGroup Cart
+     *
+     * @apiHeader (Authorization) {String} authorization Authorization value.
+     *
+     *
+     * @apiSuccess {Array} data 返回的数据结构体
+     * @apiSuccess {Number} status  1 执行成功 0 为执行失败
+     * @apiSuccess {string} msg 执行信息提示
+     * @apiSuccessExample Success-Response:
+     *{
+     * "response": {
+     * "data": [
+     * {
+     * "uid": 2,
+     * "name": "她芬优惠产品",
+     * "description": "测试用例",
+     * "discount_price": 80,
+     * "original_price": 13100,
+     * "stock": 300,
+     * "already_sold": 12121,
+     * "combos_id": 0,
+     * "update_time": "2018-09-14 18:01:27",
+     * "category_id": 2,
+     * "is_onsale": 1,
+     * "is_new": 0,
+     * "is_hot": 0,
+     * "is_agent_type": 0,
+     * "agent_type_id": 0,
+     * "delivery_fee": 5,
+     * "is_coupon": 1,
+     * "thumbnail_img": "https://dj.mqphp.com/images/good2.jpg",
+     * "attribute_id": "2",
+     * "agent_price": null,
+     * "last_price": 80,
+     * "attributes": {
+     * "name": "规格",
+     * "list": [
+     * {
+     * "title": "规格",
+     * "id": 6,
+     * "attr_id": 2,
+     * "good_id": 2,
+     * "name": "100",
+     * "original_price": null,
+     * "stock": null,
+     * "discount_price": null,
+     * "is_coupon": null,
+     * "agent_price": 0,
+     * "last_price": 0
+     * },
+     * {
+     * "title": "规格",
+     * "id": 7,
+     * "attr_id": 2,
+     * "good_id": 2,
+     * "name": "100",
+     * "original_price": null,
+     * "stock": null,
+     * "discount_price": null,
+     * "is_coupon": null,
+     * "agent_price": 0,
+     * "last_price": 0
+     * }
+     * ]
+     * }
+     * },
+     * {
+     * "uid": 4,
+     * "name": "单方精油",
+     * "description": "测试用例",
+     * "discount_price": null,
+     * "original_price": 13800,
+     * "stock": 48,
+     * "already_sold": 332,
+     * "combos_id": 0,
+     * "update_time": "2018-09-14 18:01:30",
+     * "category_id": 3,
+     * "is_onsale": 1,
+     * "is_new": 0,
+     * "is_hot": 0,
+     * "is_agent_type": 0,
+     * "agent_type_id": 0,
+     * "delivery_fee": 0,
+     * "is_coupon": 0,
+     * "thumbnail_img": "https://dj.mqphp.com/images/good4.jpg",
+     * "attribute_id": "2",
+     * "agent_price": 11040,
+     * "last_price": 2760
+     * },
+     * {
+     * "uid": 5,
+     * "name": "她芬优惠产品1",
+     * "description": "测试用例",
+     * "discount_price": null,
+     * "original_price": 13800,
+     * "stock": 48,
+     * "already_sold": 332,
+     * "combos_id": 0,
+     * "update_time": "2018-09-14 18:01:30",
+     * "category_id": 2,
+     * "is_onsale": 1,
+     * "is_new": 0,
+     * "is_hot": 0,
+     * "is_agent_type": 0,
+     * "agent_type_id": 0,
+     * "delivery_fee": 0,
+     * "is_coupon": 0,
+     * "thumbnail_img": "https://dj.mqphp.com/images/good2.jpg",
+     * "attribute_id": "2",
+     * "agent_price": 11040,
+     * "last_price": 2760
+     * },
+     * {
+     * "uid": 13,
+     * "name": "芳香辅材",
+     * "description": "测试用例",
+     * "discount_price": null,
+     * "original_price": 13800,
+     * "stock": 48,
+     * "already_sold": 332,
+     * "combos_id": 0,
+     * "update_time": "2018-09-14 18:01:30",
+     * "category_id": 6,
+     * "is_onsale": 1,
+     * "is_new": 0,
+     * "is_hot": 0,
+     * "is_agent_type": 0,
+     * "agent_type_id": 0,
+     * "delivery_fee": 0,
+     * "is_coupon": 0,
+     * "thumbnail_img": "https://dj.mqphp.com/images/good2.jpg",
+     * "attribute_id": "2",
+     * "agent_price": 11040,
+     * "last_price": 2760
+     * }
+     * ],
+     * "status": 1,
+     * "msg": "success"
+     * }
+     * }
+     */
+    public function guessLike()
+    {
+        $all = Good::all()->toArray();
+        $rand = array_rand($all, 4);
+        $good_list = Good::whereIn('uid', $rand)->get();
+        foreach ($good_list as $good) {
+            //代理价格
+            $client_id = session('client.id');
+            if ($client_id) {
+                $res = Client::select('discount_rate')->leftJoin('agent_type', 'agent_type.id', '=', 'agent_type_id')
+                    ->where('clients.id', $client_id)->first();
+                $rate = $this->client->getAgentRate($client_id);
+                if (isset($res->discount_rate) && $good->is_coupon <= 0) {
+                    $good->agent_price = ($good->original_price * (100 - $res->discount_rate) / 100);
+                } else {
+                    $good->agent_price = null;
+                }
+                if ($good->is_coupon) {
+                    $good->last_price = $good->discount_price;
+                } else {
+                    $good->last_price = ($rate * $good->original_price / 100);
+                }
+                $attributes = Attribute::select('attributes.name as title', 'agm.*')->where('attributes.id', $good->attribute_id)
+                    ->rightJoin('attr_good_mapping as agm', 'agm.attr_id', '=', 'attributes.id')
+                    ->where('agm.good_id', $good->uid)
+                    ->get();
+                foreach ($attributes as $item) {
+                    $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
+                    if ($item->is_coupon) {
+                        $item->last_price = $item->discount_price;
+                    } else {
+                        $item->last_price = ($rate * $item->original_price / 100);
+                    }
+                }
+                if ($attributes->count()) {
+                    $good->attributes = [
+                        'name' => $attributes[0]->title,
+                        'list' => $attributes
+                    ];
+                }
+            }
+        }
+        return response_format($good_list);
+
     }
 }
