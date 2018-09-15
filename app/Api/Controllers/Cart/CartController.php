@@ -182,4 +182,66 @@ class CartController extends BaseController
         }
 
     }
+
+    /**
+     * @api {post} /api/cart/cart_list  获取购物车列表
+     * @apiName cart_list
+     * @apiGroup Cart
+     *
+     * @apiHeader (Authorization) {String} authorization Authorization value.
+     *
+     * @apiParam {int} [limit] 每页显示数量
+     * @apiParam {int} [page] 页码
+     *
+     * @apiSuccess {Array} data 返回的数据结构体
+     * @apiSuccess {Number} status  1 执行成功 0 为执行失败
+     * @apiSuccess {string} msg 执行信息提示
+     * @apiSuccessExample Success-Response:
+     *{
+     * "response": {
+     * "data": {
+     * "current_page": 1,
+     * "data": [
+     * {
+     * "id": 3,
+     * "client_id": 16,
+     * "good_id": 3,
+     * "number": 1,
+     * "attr_good_mapping_id": 2,
+     * "original_price": 10000,
+     * "discount_price": null,
+     * "agent_price": 8000,
+     * "last_price": 8000,
+     * "total_price": 8000,
+     * "attribute_name": "200ml",
+     * "memo": null,
+     * "shipping_fee": 0,
+     * "updated_at": null,
+     * "created_at": null,
+     * "good_name": "单方精油",
+     * "description": "测试用例",
+     * "thumbnail_img": "https://dj.mqphp.com/images/good3.jpg"
+     * }
+     * ],
+     * "from": 1,
+     * "last_page": 1,
+     * "next_page_url": null,
+     * "path": "http://www.tafen.com/api/cart/cart_list",
+     * "per_page": 10,
+     * "prev_page_url": null,
+     * "to": 1,
+     * "total": 1
+     * },
+     * "status": 1,
+     * "msg": "success"
+     * }
+     * }
+     */
+    public function cart_list(Request $request)
+    {
+        $limit = $request->get('limit', 10);
+        $client_id = $this->client->getUserByOpenId()->id;
+        $cart_list = Cart::select('carts.*', 'goods.name as good_name', 'goods.description', 'goods.thumbnail_img')->leftJoin('goods', 'good_id', '=', 'uid')->where('client_id', $client_id)->paginate($limit);
+        return response_format($cart_list);
+    }
 }

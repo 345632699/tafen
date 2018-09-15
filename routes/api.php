@@ -58,6 +58,7 @@ $api->version('v1', function ($api) {
             $api->post('cart/create','Cart\CartController@addToCart');
             $api->post('cart/update','Cart\CartController@updateCart');
             $api->post('cart/delete','Cart\CartController@deleteCart');
+            $api->get('cart/cart_list', 'Cart\CartController@cart_list');
 
         });
 
