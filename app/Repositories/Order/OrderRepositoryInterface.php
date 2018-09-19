@@ -27,7 +27,7 @@ interface OrderRepositoryInterface {
      */
     public function createInvoice($client_id,$order_id,$total_price,$request);
 
-    public function getOrderList($order_status);
+    public function getOrderList($order_status, $keyword);
 
     public function getOrderDetail($order_id);
 

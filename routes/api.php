@@ -54,6 +54,7 @@ $api->version('v1', function ($api) {
             $api->post('order/wxpaysdk','Order\OrderController@getWxPayConfig'); // 获取微信支付SDK
             $api->post('order/confirm','Order\OrderController@confirmReceipt');
             $api->post('order/cancel','Order\OrderController@cancelOrder');
+            $api->get('order/search', 'Order\OrderController@getOrderList');
 
             $api->post('cart/create','Cart\CartController@addToCart');
             $api->post('cart/update','Cart\CartController@updateCart');
@@ -78,6 +79,8 @@ $api->version('v1', function ($api) {
 
             //商品路由
             $api->get('good','Goods\GoodController@index');
+            //商品搜索
+            $api->get('good/search', 'Goods\GoodController@search');
             //商品分类列表
             $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
 

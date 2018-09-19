@@ -104,7 +104,7 @@ class OrderRepository implements OrderRepositoryInterface
         return $delivery;
     }
 
-    public function getOrderList($order_status, $limit = 5)
+    public function getOrderList($order_status, $keywords, $limit = 5)
     {
         if ($order_status >= 0 ){
             $where['order_status'] = $order_status;
@@ -112,26 +112,51 @@ class OrderRepository implements OrderRepositoryInterface
         }else{
             $where['client_id'] = session('client.id');
         }
-        $limit = $limit ? $limit : 5;
-        $order_list = \DB::table('order_headers')
-            ->select(
-                'order_headers.*',
-                'order_headers.uid as order_id',
-                'order_type',
-                'order_status',
-                'order_date',
-                'completion_date',
-                'return_date',
-                'request_close_date',
-                'expired_time',
-                'pay_type',
-                'pay_name',
-                'pay_date',
-                'shipping_fee'
-            )
-            ->where($where)
-            ->orderBy('order_date','desc')
-            ->paginate($limit)->toArray();
+        if ($keywords) {
+            $limit = $limit ? $limit : 5;
+            $order_list = \DB::table('order_headers')
+                ->select(
+                    'order_headers.*',
+                    'order_headers.uid as order_id',
+                    'order_type',
+                    'order_status',
+                    'order_date',
+                    'completion_date',
+                    'return_date',
+                    'request_close_date',
+                    'expired_time',
+                    'pay_type',
+                    'pay_name',
+                    'pay_date',
+                    'shipping_fee'
+                )
+                ->where($where)
+                ->where('order_number', 'like', '%' . $keywords . '%')
+                ->orderBy('order_date', 'desc')
+                ->paginate($limit)->toArray();
+        } else {
+            $limit = $limit ? $limit : 5;
+            $order_list = \DB::table('order_headers')
+                ->select(
+                    'order_headers.*',
+                    'order_headers.uid as order_id',
+                    'order_type',
+                    'order_status',
+                    'order_date',
+                    'completion_date',
+                    'return_date',
+                    'request_close_date',
+                    'expired_time',
+                    'pay_type',
+                    'pay_name',
+                    'pay_date',
+                    'shipping_fee'
+                )
+                ->where($where)
+                ->orderBy('order_date', 'desc')
+                ->paginate($limit)->toArray();
+        }
+
 
         foreach ($order_list['data'] as $order){
             $list = Order::select('ol.*','goods.name as good_name','goods.thumbnail_img','goods.description','attr.name as attr_name','agm.name as attr_value')

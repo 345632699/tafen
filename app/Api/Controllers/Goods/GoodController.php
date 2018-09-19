@@ -166,6 +166,137 @@ class GoodController extends BaseController
      * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
      *
      *
+     * @apiParam {string} keyword 商品名称
+     * @apiParam {int} limit 分页条数
+     * @apiParam {int} page 页码
+     * @apiSuccess {int} index_display 是否首页显示  1显示  0 为不显示
+     * @apiSuccess {String} cat_icon_img 预留字段 分类图标
+     * @apiSuccess {String} jump_url 分类点解跳转url 备选择端
+     * @apiSuccess {Array} category 分类详情
+     * @apiSuccess {Array} good_list 商品列表
+     * @apiSuccess {int} total 记录总数
+     * @apiSuccess {int} last_page 最后的页码
+     * @apiSuccess {int} per_page 每页显示条数 默认5 可以通过传limit改变
+     * @apiSuccess {float} discount_price 商城价格 折后价格 当is_coupon为1 且这个字段不为null时显示折扣价，该价格与代理折扣价格不会同时存在 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {float} original_price 原价格 默认返回的价格 未选择规格参数时 默认展示该价格 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} last_price 最后计算价格 实际用于支付使用的价格 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} agent_price 一级代理价格 当为null时显示原价 不显示代理折扣价 (选择规格时，以规格中的属性价格为准) 单位为分
+     * @apiSuccess {int} stock 库存 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {int} already_sold 已销售数量 (选择规格时，以规格中的属性价格为准)
+     * @apiSuccess {int} category_id 分类ID
+     * @apiSuccess {int} is_onsale 是否上家
+     * @apiSuccess {int} is_new 是否是新品
+     * @apiSuccess {int} is_hot 是否热卖
+     * @apiSuccess {float} delivery_fee 运费
+     * @apiSuccess {int} is_coupon 是否是优惠专区的商品
+     * @apiSuccess {int} thumbnail_img 商品缩略图
+     * @apiSuccess {Array} data 返回机构体
+     * @apiSuccess {Number} status  1 执行成功 0 为执行失败
+     * @apiSuccess {string} msg 执行信息提示
+     *
+     * @apiSuccessExample Success-Response:
+     *{
+    * "response": {
+    * "data": {
+    * "category": {
+    * "id": 1,
+    * "name": "默认分类",
+    * "cat_banner": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1534786474535&di=b694f92d900be6065127c018026c556a&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F9358d109b3de9c82e881a8126681800a18d84342.jpg",
+    * "index_display": 0,
+    * "cat_icon_img": null,
+    * "jump_url": null,
+    * "created_at": null,
+    * "updated_at": "2018-08-20 14:47:52"
+    * },
+    * "good_list": {
+    * "current_page": 1,
+    * "data": [
+    * {
+    * "uid": 2,
+    * "name": "她芬优惠产品",
+    * "description": "测试用例",
+    * "discount_price": 80,
+    * "original_price": 130,
+    * "stock": 300,
+    * "already_sold": 12121,
+    * "combos_id": 0,
+    * "update_time": "2018-09-05 08:22:12",
+    * "category_id": 1,
+    * "is_onsale": 1,
+    * "is_new": 0,
+    * "is_hot": 0,
+    * "is_agent_type": 0,
+    * "agent_type_id": 0,
+    * "delivery_fee": 5,
+    * "is_coupon": 1,
+    * "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+    * "attribute_id": "1",
+    * "agent_price": null,
+    * "last_price": 80,
+    * "attributes": {
+    * "name": "套餐",
+    * "list": [
+    * {
+    * "title": "套餐",
+    * "id": 5,
+    * "attr_id": 1,
+    * "good_id": 1,
+    * "name": "test",
+    * "original_price": 100,
+    * "stock": 100,
+    * "discount_price": null,
+    * "is_coupon": null,
+    * "agent_price": "20.00",
+    * "last_price": "20.00"
+    * }
+    * ]
+    * }
+    * }
+    * ],
+    * "from": 1,
+    * "last_page": 1,
+    * "next_page_url": null,
+    * "path": "http://www.tafen.com/api/cat_goods",
+    * "per_page": 10,
+    * "prev_page_url": null,
+    * "to": 1,
+    * "total": 1
+    * }
+    * },
+    * "status": 1,
+    * "msg": "success"
+    * }
+    * }
+     */
+    public function categoryGoodsList(Request $request){
+        $limit = $request->get('limit',5);
+        $cat_id = $request->get('cat_id',1);
+        $is_coupon = $request->get('is_coupon',0);
+        //是否是优惠产品
+        $where = [];
+        if ($cat_id) {
+            $where['category_id'] = $cat_id;
+        }
+        // 需要获取优惠产品才生效
+        if ($is_coupon) {
+            $where['is_coupon'] = $is_coupon;
+        }
+        $category = Category::find($cat_id);
+        $good_list = Good::where($where)->paginate($limit);
+        $this->improveGoodList($good_list);
+        $resData['category'] = $category;
+        $resData['good_list'] = $good_list;
+        return response_format($resData);
+    }
+
+    /**
+     * @api {get} /good/search 商品名查询商品
+     * @apiName 商品名查询商品
+     * @apiGroup Good
+     *
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     *
      * @apiParam {int} cat_id 分类ID
      * @apiParam {int} limit 分页条数
      * @apiParam {int} page 页码
@@ -198,30 +329,99 @@ class GoodController extends BaseController
      *{
     "response": {
     "data": {
-    "category": {
-    "id": 1,
-    "name": "默认分类",
-    "cat_banner": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1534786474535&di=b694f92d900be6065127c018026c556a&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F9358d109b3de9c82e881a8126681800a18d84342.jpg",
-    "index_display": 0,
-    "cat_icon_img": null,
-    "jump_url": null,
-    "created_at": null,
-    "updated_at": "2018-08-20 14:47:52"
-    },
-    "good_list": {
     "current_page": 1,
     "data": [
+    {
+    "uid": 1,
+    "name": "她芬精油",
+    "description": "测试用例",
+    "discount_price": null,
+    "original_price": 39900,
+    "stock": 499,
+    "already_sold": 33,
+    "combos_id": 0,
+    "update_time": "2018-09-14 18:01:23",
+    "category_id": 1,
+    "is_onsale": 1,
+    "is_new": 1,
+    "is_hot": 1,
+    "is_agent_type": 1,
+    "agent_type_id": 1,
+    "delivery_fee": 5,
+    "is_coupon": 0,
+    "thumbnail_img": "https://dj.mqphp.com/images/good1.jpg",
+    "attribute_id": "2",
+    "agent_price": 31920,
+    "last_price": 7980,
+    "attributes": {
+    "name": "规格",
+    "list": [
+    {
+    "title": "规格",
+    "id": 1,
+    "attr_id": 2,
+    "good_id": 1,
+    "name": "100ml",
+    "original_price": 20000,
+    "stock": 100,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 4000,
+    "last_price": 4000
+    },
+    {
+    "title": "规格",
+    "id": 2,
+    "attr_id": 2,
+    "good_id": 1,
+    "name": "200ml",
+    "original_price": 30000,
+    "stock": 200,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 6000,
+    "last_price": 6000
+    },
+    {
+    "title": "规格",
+    "id": 3,
+    "attr_id": 2,
+    "good_id": 1,
+    "name": "300ml",
+    "original_price": 65500,
+    "stock": 300,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 13100,
+    "last_price": 13100
+    },
+    {
+    "title": "规格",
+    "id": 4,
+    "attr_id": 2,
+    "good_id": 1,
+    "name": "500ml",
+    "original_price": 50000,
+    "stock": 400,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 10000,
+    "last_price": 10000
+    }
+    ]
+    }
+    },
     {
     "uid": 2,
     "name": "她芬优惠产品",
     "description": "测试用例",
     "discount_price": 80,
-    "original_price": 130,
+    "original_price": 13100,
     "stock": 300,
     "already_sold": 12121,
     "combos_id": 0,
-    "update_time": "2018-09-05 08:22:12",
-    "category_id": 1,
+    "update_time": "2018-09-14 18:01:27",
+    "category_id": 2,
     "is_onsale": 1,
     "is_new": 0,
     "is_hot": 0,
@@ -229,25 +429,161 @@ class GoodController extends BaseController
     "agent_type_id": 0,
     "delivery_fee": 5,
     "is_coupon": 1,
-    "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
-    "attribute_id": "1",
+    "thumbnail_img": "https://dj.mqphp.com/images/good2.jpg",
+    "attribute_id": "2",
     "agent_price": null,
     "last_price": 80,
     "attributes": {
-    "name": "套餐",
+    "name": "规格",
     "list": [
     {
-    "title": "套餐",
-    "id": 5,
-    "attr_id": 1,
-    "good_id": 1,
-    "name": "test",
-    "original_price": 100,
-    "stock": 100,
+    "title": "规格",
+    "id": 6,
+    "attr_id": 2,
+    "good_id": 2,
+    "name": "100ml",
+    "original_price": 60000,
+    "stock": 300,
     "discount_price": null,
-    "is_coupon": null,
-    "agent_price": "20.00",
-    "last_price": "20.00"
+    "is_coupon": 0,
+    "agent_price": 12000,
+    "last_price": 12000
+    },
+    {
+    "title": "规格",
+    "id": 7,
+    "attr_id": 2,
+    "good_id": 2,
+    "name": "200ml",
+    "original_price": 80000,
+    "stock": 300,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 16000,
+    "last_price": 16000
+    }
+    ]
+    }
+    },
+    {
+    "uid": 5,
+    "name": "她芬优惠产品1",
+    "description": "测试用例",
+    "discount_price": null,
+    "original_price": 13800,
+    "stock": 48,
+    "already_sold": 332,
+    "combos_id": 0,
+    "update_time": "2018-09-14 18:01:30",
+    "category_id": 2,
+    "is_onsale": 1,
+    "is_new": 0,
+    "is_hot": 0,
+    "is_agent_type": 0,
+    "agent_type_id": 0,
+    "delivery_fee": 0,
+    "is_coupon": 0,
+    "thumbnail_img": "https://dj.mqphp.com/images/good2.jpg",
+    "attribute_id": "2",
+    "agent_price": 11040,
+    "last_price": 2760,
+    "attributes": {
+    "name": "规格",
+    "list": [
+    {
+    "title": "规格",
+    "id": 11,
+    "attr_id": 2,
+    "good_id": 5,
+    "name": "200ml",
+    "original_price": 80000,
+    "stock": 300,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 16000,
+    "last_price": 16000
+    }
+    ]
+    }
+    },
+    {
+    "uid": 6,
+    "name": "她芬优惠产品32",
+    "description": "测试用例",
+    "discount_price": null,
+    "original_price": 13800,
+    "stock": 48,
+    "already_sold": 332,
+    "combos_id": 0,
+    "update_time": "2018-09-14 18:01:30",
+    "category_id": 2,
+    "is_onsale": 1,
+    "is_new": 0,
+    "is_hot": 0,
+    "is_agent_type": 0,
+    "agent_type_id": 0,
+    "delivery_fee": 0,
+    "is_coupon": 0,
+    "thumbnail_img": "https://dj.mqphp.com/images/good3.jpg",
+    "attribute_id": "2",
+    "agent_price": 11040,
+    "last_price": 2760,
+    "attributes": {
+    "name": "规格",
+    "list": [
+    {
+    "title": "规格",
+    "id": 12,
+    "attr_id": 2,
+    "good_id": 6,
+    "name": "200ml",
+    "original_price": 80000,
+    "stock": 300,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 16000,
+    "last_price": 16000
+    }
+    ]
+    }
+    },
+    {
+    "uid": 7,
+    "name": "她芬优惠产品3",
+    "description": "测试用例",
+    "discount_price": null,
+    "original_price": 13800,
+    "stock": 48,
+    "already_sold": 332,
+    "combos_id": 0,
+    "update_time": "2018-09-14 18:01:30",
+    "category_id": 2,
+    "is_onsale": 1,
+    "is_new": 0,
+    "is_hot": 0,
+    "is_agent_type": 0,
+    "agent_type_id": 0,
+    "delivery_fee": 0,
+    "is_coupon": 0,
+    "thumbnail_img": "https://dj.mqphp.com/images/good4.jpg",
+    "attribute_id": "2",
+    "agent_price": 11040,
+    "last_price": 2760,
+    "attributes": {
+    "name": "规格",
+    "list": [
+    {
+    "title": "规格",
+    "id": 13,
+    "attr_id": 2,
+    "good_id": 7,
+    "name": "200ml",
+    "original_price": 80000,
+    "stock": 300,
+    "discount_price": null,
+    "is_coupon": 0,
+    "agent_price": 16000,
+    "last_price": 16000
     }
     ]
     }
@@ -256,33 +592,29 @@ class GoodController extends BaseController
     "from": 1,
     "last_page": 1,
     "next_page_url": null,
-    "path": "http://www.tafen.com/api/cat_goods",
+    "path": "http://www.tafen.com/api/good/search",
     "per_page": 10,
     "prev_page_url": null,
-    "to": 1,
-    "total": 1
-    }
+    "to": 5,
+    "total": 5
     },
     "status": 1,
     "msg": "success"
     }
     }
      */
-    public function categoryGoodsList(Request $request){
-        $limit = $request->get('limit',5);
-        $cat_id = $request->get('cat_id',1);
-        $is_coupon = $request->get('is_coupon',0);
-        //是否是优惠产品
-        $where = [];
-        if ($cat_id) {
-            $where['category_id'] = $cat_id;
-        }
-        // 需要获取优惠产品才生效
-        if ($is_coupon) {
-            $where['is_coupon'] = $is_coupon;
-        }
-        $category = Category::find($cat_id);
-        $good_list = Good::where($where)->paginate($limit);
+
+    public function search(Request $request)
+    {
+        $keyword = $request->keyword;
+        $limit = $request->get('limit', 10);
+        $query = '%' . $keyword . '%';
+        $good_list = Good::where('name', 'like', $query)->paginate($limit);
+        $this->improveGoodList($good_list);
+        return response_format($good_list);
+    }
+
+    public function improveGoodList($good_list){
         foreach($good_list as $good){
             //代理价格
             $client_id = session('client.id');
@@ -300,10 +632,10 @@ class GoodController extends BaseController
                 }else{
                     $good->last_price = ($rate * $good->original_price / 100);
                 }
-                $attributes = Attribute::select('attributes.name as title','agm.*')->where('attributes.id',$good->attribute_id)
-                        ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')
-                        ->where('agm.good_id',$good->uid)
-                        ->get();
+                $attributes = Attribute::select('attributes.name as title', 'agm.*')->where('attributes.id', $good->attribute_id)
+                    ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')
+                    ->where('agm.good_id',$good->uid)
+                    ->get();
                 foreach ($attributes as $item){
                     $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
                     if ($item->is_coupon){
@@ -320,8 +652,5 @@ class GoodController extends BaseController
                 }
             }
         }
-        $resData['category'] = $category;
-        $resData['good_list'] = $good_list;
-        return response_format($resData);
     }
 }
