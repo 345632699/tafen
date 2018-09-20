@@ -140,7 +140,7 @@ class ClientRepository implements ClientRepositoryInterface
         $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
             ->where('clients.id',$client_id)->first();
         if(isset($res->discount_rate) ){
-            return $res->discount_rate;
+            return 100 - $res->discount_rate;
         }else{
             return 100;
         }
