@@ -6,6 +6,7 @@ use App\Model\Cart;
 use App\Repositories\Client\ClientRepository;
 use App\Repositories\Order\OrderRepository;
 use App\Repositories\Pay\PayRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Mockery\Exception;
 
@@ -722,15 +723,21 @@ class OrderController extends BaseController
 
     public function returnMoney(Request $request)
     {
-        $data['good_status'] = $request->good_status;
-        $data['order_header_id'] = $request->order_header_id;
-        $data['return_order_status'] = $request->return_order_status; // 退货单状态订单状态，见xm_lookup_values表RETURN_ORDER_STATUS：0-提交申请，1-审批拒绝，2-审批通过，3-退货中，4-已完成，5-异常
-        $data['return_request_type'] = $request->get('return_request_type', 0); //退货发起类型，，见xm_lookup_values表RETURN_REQUEST_TYPE：0-用户发起，我方发起
-        $data['return_order_number'] = 'R_' . time();
-        $data['return_reason_type'] = $request->return_reason_type; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
-        $data['return_reason'] = $request->return_reason; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
-        $data['request_client_id'] = $request->request_client_id;
-
+        try {
+            $data['good_status'] = $request->good_status;
+            $data['order_header_id'] = $request->order_header_id;
+            $data['return_order_status'] = $request->return_order_status; // 退货单状态订单状态，见xm_lookup_values表RETURN_ORDER_STATUS：0-提交申请，1-审批拒绝，2-审批通过，3-退货中，4-已完成，5-异常
+            $data['return_request_type'] = $request->get('return_request_type', 0); //退货发起类型，，见xm_lookup_values表RETURN_REQUEST_TYPE：0-用户发起，我方发起
+            $data['return_order_number'] = 'R_' . time();
+            $data['return_reason_type'] = $request->return_reason_type; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
+            $data['return_reason'] = $request->return_reason; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
+            $data['request_client_id'] = $request->request_client_id;
+            $data['request_date'] = Carbon::now();
+            $res = \DB::table('return_orders')->insertGetId($data);
+            return response_format($res, 1, '申请退货成功', 200);
+        } catch (Exception $e) {
+            return response_format([], 0, $e->getMessage(), 501);
+        }
     }
 
 }

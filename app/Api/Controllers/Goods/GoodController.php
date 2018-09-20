@@ -166,7 +166,7 @@ class GoodController extends BaseController
      * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
      *
      *
-     * @apiParam {string} keyword 商品名称
+     * @apiParam {int} cat_id 分类ID
      * @apiParam {int} limit 分页条数
      * @apiParam {int} page 页码
      * @apiSuccess {int} index_display 是否首页显示  1显示  0 为不显示
@@ -196,68 +196,68 @@ class GoodController extends BaseController
      *
      * @apiSuccessExample Success-Response:
      *{
-    * "response": {
-    * "data": {
-    * "category": {
-    * "id": 1,
-    * "name": "默认分类",
-    * "cat_banner": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1534786474535&di=b694f92d900be6065127c018026c556a&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F9358d109b3de9c82e881a8126681800a18d84342.jpg",
-    * "index_display": 0,
-    * "cat_icon_img": null,
-    * "jump_url": null,
-    * "created_at": null,
-    * "updated_at": "2018-08-20 14:47:52"
-    * },
-    * "good_list": {
-    * "current_page": 1,
-    * "data": [
-    * {
-    * "uid": 2,
-    * "name": "她芬优惠产品",
-    * "description": "测试用例",
-    * "discount_price": 80,
-    * "original_price": 130,
-    * "stock": 300,
-    * "already_sold": 12121,
-    * "combos_id": 0,
-    * "update_time": "2018-09-05 08:22:12",
-    * "category_id": 1,
-    * "is_onsale": 1,
-    * "is_new": 0,
-    * "is_hot": 0,
-    * "is_agent_type": 0,
-    * "agent_type_id": 0,
-    * "delivery_fee": 5,
-    * "is_coupon": 1,
-    * "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
-    * "attribute_id": "1",
-    * "agent_price": null,
-    * "last_price": 80,
-    * "attributes": {
-    * "name": "套餐",
-    * "list": [
-    * {
-    * "title": "套餐",
-    * "id": 5,
-    * "attr_id": 1,
-    * "good_id": 1,
-    * "name": "test",
-    * "original_price": 100,
-    * "stock": 100,
-    * "discount_price": null,
-    * "is_coupon": null,
-    * "agent_price": "20.00",
-    * "last_price": "20.00"
-    * }
-    * ]
-    * }
-    * }
-    * ],
-    * "from": 1,
-    * "last_page": 1,
-    * "next_page_url": null,
-    * "path": "http://www.tafen.com/api/cat_goods",
-    * "per_page": 10,
+     * "response": {
+     * "data": {
+     * "category": {
+     * "id": 1,
+     * "name": "默认分类",
+     * "cat_banner": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1534786474535&di=b694f92d900be6065127c018026c556a&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F9358d109b3de9c82e881a8126681800a18d84342.jpg",
+     * "index_display": 0,
+     * "cat_icon_img": null,
+     * "jump_url": null,
+     * "created_at": null,
+     * "updated_at": "2018-08-20 14:47:52"
+     * },
+     * "good_list": {
+     * "current_page": 1,
+     * "data": [
+     * {
+     * "uid": 2,
+     * "name": "她芬优惠产品",
+     * "description": "测试用例",
+     * "discount_price": 80,
+     * "original_price": 130,
+     * "stock": 300,
+     * "already_sold": 12121,
+     * "combos_id": 0,
+     * "update_time": "2018-09-05 08:22:12",
+     * "category_id": 1,
+     * "is_onsale": 1,
+     * "is_new": 0,
+     * "is_hot": 0,
+     * "is_agent_type": 0,
+     * "agent_type_id": 0,
+     * "delivery_fee": 5,
+     * "is_coupon": 1,
+     * "thumbnail_img": "http://img5.imgtn.bdimg.com/it/u=77511056,783740313&fm=27&gp=0.jpg",
+     * "attribute_id": "1",
+     * "agent_price": null,
+     * "last_price": 80,
+     * "attributes": {
+     * "name": "套餐",
+     * "list": [
+     * {
+     * "title": "套餐",
+     * "id": 5,
+     * "attr_id": 1,
+     * "good_id": 1,
+     * "name": "test",
+     * "original_price": 100,
+     * "stock": 100,
+     * "discount_price": null,
+     * "is_coupon": null,
+     * "agent_price": "20.00",
+     * "last_price": "20.00"
+     * }
+     * ]
+     * }
+     * }
+     * ],
+     * "from": 1,
+     * "last_page": 1,
+     * "next_page_url": null,
+     * "path": "http://www.tafen.com/api/cat_goods",
+     * "per_page": 10,
     * "prev_page_url": null,
     * "to": 1,
     * "total": 1
@@ -288,7 +288,6 @@ class GoodController extends BaseController
         $resData['good_list'] = $good_list;
         return response_format($resData);
     }
-
     /**
      * @api {get} /good/search 商品名查询商品
      * @apiName 商品名查询商品
@@ -297,7 +296,7 @@ class GoodController extends BaseController
      * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
      *
      *
-     * @apiParam {int} cat_id 分类ID
+     * @apiParam {string} keyword 商品名称
      * @apiParam {int} limit 分页条数
      * @apiParam {int} page 页码
      * @apiSuccess {int} index_display 是否首页显示  1显示  0 为不显示
@@ -607,9 +606,9 @@ class GoodController extends BaseController
     public function search(Request $request)
     {
         $keyword = $request->keyword;
-        $limit = $request->get('limit', 10);
-        $query = '%' . $keyword . '%';
-        $good_list = Good::where('name', 'like', $query)->paginate($limit);
+        $limit = $request->get('limit',10);
+        $query = '%'.$keyword.'%';
+        $good_list = Good::where('name','like',$query)->paginate($limit);
         $this->improveGoodList($good_list);
         return response_format($good_list);
     }
@@ -629,10 +628,10 @@ class GoodController extends BaseController
                 }
                 if ($good->is_coupon){
                     $good->last_price = $good->discount_price;
-                }else{
+                } else {
                     $good->last_price = ($rate * $good->original_price / 100);
                 }
-                $attributes = Attribute::select('attributes.name as title', 'agm.*')->where('attributes.id', $good->attribute_id)
+                $attributes = Attribute::select('attributes.name as title','agm.*')->where('attributes.id',$good->attribute_id)
                     ->rightJoin('attr_good_mapping as agm','agm.attr_id','=','attributes.id')
                     ->where('agm.good_id',$good->uid)
                     ->get();
