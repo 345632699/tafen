@@ -190,4 +190,14 @@ class ClientController extends BaseController
         return response_format($data);
     }
 
+    public function getQrcode()
+    {
+        $clientId = $this->client->getUserByOpenId()->id;
+        $app = app('wechat.mini_program');
+        $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
+        if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
+            $filename = $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
+            return $_SERVER["HTTP_HOST"] . '/qrcode/' . $filename;
+        }
+    }
 }

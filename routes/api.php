@@ -83,6 +83,8 @@ $api->version('v1', function ($api) {
             $api->get('good/search', 'Goods\GoodController@search');
             //商品分类列表
             $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
+            //获取二维码
+            $api->get('getQrcode', 'Client\ClientController@getQrcode');
 
 
         });
