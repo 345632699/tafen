@@ -82,7 +82,10 @@ class CartController extends BaseController
         $Cart['total_price'] = $Cart['last_price'] * $Cart['number'];
         $cart = Cart::where(['client_id'=>$client_id,'good_id'=>$request->good_id])->get()->first();
         if ($cart){
-            $cart->update(['number' => $Cart['number']]);
+            $cart->update([
+                'number' => $cart->number + $Cart['number'],
+                'total_price' => $Cart['last_price'] * $cart->number + $Cart['number']
+            ]);
             return response_format($cart);
         }else{
             $res = Cart::create($Cart);
