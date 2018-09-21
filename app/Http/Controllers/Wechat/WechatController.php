@@ -44,4 +44,14 @@ class WechatController extends Controller
         }
 
     }
+
+    public function getQrcode()
+    {
+        $app = app('wechat.mini_program');
+        $response = $app->app_code->get('page/main/main?client_id=1');
+        if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
+            $filename = $response->saveAs(public_path('qrcode'), 'appcode.png');
+            dd($filename);
+        }
+    }
 }
