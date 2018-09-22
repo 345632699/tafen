@@ -61,7 +61,7 @@ class ClientController extends BaseController
      */
     public function index() {
         $client_id = $this->client->getUserByOpenId()->id;
-        $client = Client::select('nick_name','clients.phone_num','avatar_url','amount','freezing_amount')
+        $client = Client::select('nick_name', 'clients.phone_num', 'avatar_url', 'amount', 'parent_id', 'freezing_amount')
                         ->leftJoin('client_amount','client_id','=','clients.id')
                         ->where('id',$client_id)
                         ->get()->first();
