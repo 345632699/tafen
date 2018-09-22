@@ -5,6 +5,7 @@ namespace App\Api\Controllers\Client;
 use App\Api\Controllers\BaseController;
 use App\Model\Client;
 use App\Model\Delivery;
+use App\Model\Good;
 use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class ClientController extends BaseController
 {
 
     private $client;
+
     public function __construct(ClientRepository $client)
     {
         $this->client = $client;
@@ -62,20 +64,33 @@ class ClientController extends BaseController
      *     }
      *
      */
-    public function index() {
+    public function index()
+    {
         $client_id = $this->client->getUserByOpenId()->id;
         $client = Client::select('nick_name', 'clients.phone_num', 'avatar_url', 'amount', 'parent_id', 'freezing_amount', 'agent_type_id')
-                        ->leftJoin('client_amount','client_id','=','clients.id')
-                        ->where('id',$client_id)
-                        ->get()->first();
+            ->leftJoin('client_amount', 'client_id', '=', 'clients.id')
+            ->where('id', $client_id)
+            ->get()->first();
         $address_id = \DB::table('client_delivery_contact')
-                        ->where('client_id',$client_id)
-                        ->Where('default_flag','Y')
-                        ->first();
+            ->where('client_id', $client_id)
+            ->Where('default_flag', 'Y')
+            ->first();
+        $agent_good_list = Good::where('agent_type_id', '>', 0)->get();
         $client->default_address_id = $address_id;
+        $client->agent_good_list = $agent_good_list;
+        $path = 'qrcode/client_' . $client_id . '.png';
+        if (!file_exists(public_path($path))) {
+            $clientId = $this->client->getUserByOpenId()->id;
+            $app = app('wechat.mini_program');
+            $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
+            if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
+                $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
+            }
+        }
+        $client->share_photo = 'http://' . $_SERVER['HTTP_HOST'] . '/qrcode/client_' . $client_id . '.png';
 
         //待支付
-        $wait_pay = Order::where(['client_id'=>$client_id,'order_status'=>0])->count();
+        $wait_pay = Order::where(['client_id' => $client_id, 'order_status' => 0])->count();
         $client->wait_pay = intval($wait_pay);
 
         return response_format($client);
@@ -84,17 +99,19 @@ class ClientController extends BaseController
     /**
      * 更新父子节点信息
      */
-    public function updateTreeNode(Request $request){
+    public function updateTreeNode(Request $request)
+    {
 
     }
 
-    public function checkBind(){
+    public function checkBind()
+    {
         $client_id = $this->client->getUserByOpenId()->id;
         $result = $this->client->checkBind($client_id);
-        if ($result){
-            return response_format(['has_bind_robot'=>1]);
-        }else{
-            return response_format(['has_bind_robot'=>0],0);
+        if ($result) {
+            return response_format(['has_bind_robot' => 1]);
+        } else {
+            return response_format(['has_bind_robot' => 0], 0);
         }
     }
 
@@ -109,19 +126,20 @@ class ClientController extends BaseController
      * @apiParam {int} limit 返回条数
      *
      */
-    public function getFlowList(Request $request){
-        $limit = $request->get('limit',20);
+    public function getFlowList(Request $request)
+    {
+        $limit = $request->get('limit', 20);
         $client_id = $this->client->getUserByOpenId()->id;
-        $type = $request->get('type',0);
+        $type = $request->get('type', 0);
         $where['client_id'] = $client_id;
         if ($type) {
             $where['type'] = $type;
         }
         $flow_list = \DB::table('client_amount_flow')
-            ->select('clients.nick_name as child_name','client_amount_flow.*')
-            ->leftJoin('clients','clients.id','=','child_id')
+            ->select('clients.nick_name as child_name', 'client_amount_flow.*')
+            ->leftJoin('clients', 'clients.id', '=', 'child_id')
             ->where($where)
-            ->orderBy('uid','desc')
+            ->orderBy('uid', 'desc')
             ->limit($limit)->get();
         return response_format($flow_list);
     }
@@ -196,11 +214,16 @@ class ClientController extends BaseController
     public function getQrcode()
     {
         $clientId = $this->client->getUserByOpenId()->id;
-        $app = app('wechat.mini_program');
-        $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
-        if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
-            $filename = $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
-            return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/qrcode/' . $filename]);
+        $path = 'qrcode/client_' . $clientId . '.png';
+        if (!file_exists(public_path($path))) {
+            $app = app('wechat.mini_program');
+            $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
+            if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
+                $filename = $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
+                return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/qrcode/' . $filename]);
+            }
+        } else {
+            return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/' . $path]);
         }
     }
 }
