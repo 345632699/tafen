@@ -72,10 +72,13 @@ class GoodRepository implements GoodRepositoryInterface
                     $item->last_price = $rate * $item->original_price / 100;
                 }
             }
-            $goods->attributes = [
-                'name'=>$attributes[0]->title,
-                'list'=>$attributes
-            ];
+            $goods->attributes = [];
+            if (isset($attributes[0])) {
+                $goods->attributes = [
+                    'name' => $attributes[0]->title,
+                    'list' => $attributes
+                ];
+            }
             $goods->detail_imgs = \DB::table('good_details')
                 ->select("url")
                 ->where('good_id',$good_id)
