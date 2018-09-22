@@ -26,6 +26,9 @@ class ClientController extends BaseController
      *
      * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
      *
+     * @apiSuccess {int} agent_type_id 代理等级ID 1为芬赚达人 2为芬赚高手 3为芬赚大事 0 为无等级 10为内部员工
+     * @apiSuccess {int} parent_id 用户的推广人ID
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -61,7 +64,7 @@ class ClientController extends BaseController
      */
     public function index() {
         $client_id = $this->client->getUserByOpenId()->id;
-        $client = Client::select('nick_name', 'clients.phone_num', 'avatar_url', 'amount', 'parent_id', 'freezing_amount')
+        $client = Client::select('nick_name', 'clients.phone_num', 'avatar_url', 'amount', 'parent_id', 'freezing_amount', 'agent_type_id')
                         ->leftJoin('client_amount','client_id','=','clients.id')
                         ->where('id',$client_id)
                         ->get()->first();
