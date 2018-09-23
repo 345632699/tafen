@@ -790,8 +790,8 @@ class OrderController extends BaseController
     }
 
     /**
-     * @api {post} /order/return 申请退款
-     * @apiName OrderReturn
+     * @api {post} /order/uploadImg 图片上传接口
+     * @apiName uploadImg
      * @apiGroup Order
      *
      * @apiHeader (Authorization) {String} authorization Authorization value.
@@ -804,16 +804,16 @@ class OrderController extends BaseController
      *
      * @apiSuccessExample Success-Response:
      * {
-    "response": {
-    "data": {
-    "path": "/order_return/jsxHtKB2_1537697894card_01.png",
-    "size": "0.27",
-    "file_display": "card_01.png"
-    },
-    "status": 1,
-    "msg": "success"
-    }
-    }
+    * "response": {
+    * "data": {
+    * "path": "/order_return/jsxHtKB2_1537697894card_01.png",
+    * "size": "0.27",
+    * "file_display": "card_01.png"
+    * },
+    * "status": 1,
+    * "msg": "success"
+    * }
+    * }
      */
     public function uploadImg(Request $request)
     {
