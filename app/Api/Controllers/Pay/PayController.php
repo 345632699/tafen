@@ -82,7 +82,7 @@ class PayController extends BaseController
                     }
 
                     // 判断商品 是否代理商品
-                    $order_lines = Order::select('ol.good_id', 'ol.last_price')
+                    $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.quantity')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
                     if ($order_lines->count() == 1) {
