@@ -408,7 +408,7 @@ class CartController extends BaseController
                 if (isset($res->discount_rate) && $good->is_coupon <= 0) {
                     $good->agent_price = ($good->original_price * (100 - $res->discount_rate) / 100);
                 } else {
-                    $good->agent_price = null;
+                    $good->agent_price = $good->original_price * 0.9;
                 }
                 if ($good->is_coupon) {
                     $good->last_price = $good->discount_price;
@@ -420,7 +420,7 @@ class CartController extends BaseController
                     ->where('agm.good_id', $good->uid)
                     ->get();
                 foreach ($attributes as $item) {
-                    $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
+                    $item->agent_price = $rate == 100 ? $item->original_price * 0.9 : $item->original_price * $rate / 100;
                     if ($item->is_coupon) {
                         $item->last_price = $item->discount_price;
                     } else {
