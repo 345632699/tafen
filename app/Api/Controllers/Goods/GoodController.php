@@ -636,7 +636,7 @@ class GoodController extends BaseController
                     ->where('agm.good_id',$good->uid)
                     ->get();
                 foreach ($attributes as $item){
-                    $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
+                    $item->agent_price = $rate == 100 ? 90 : $item->original_price * $rate / 100;
                     if ($item->is_coupon){
                         $item->last_price = $item->discount_price;
                     }else{
