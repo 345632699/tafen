@@ -30,7 +30,6 @@ class PayRepository implements PayRepositoryInterface
         } else {
             $payBill['total_fee'] = $pay['total_price'];
         }
-        $payBill['total_fee'] = $pay['total_price'];
         $payBill['spbill_create_ip'] = '';
         $payBill['notify_url'] = 'https://wxapp.honeybot.cn/api/pay/notify';
         $payBill['trade_type'] = 'JSAPI';
