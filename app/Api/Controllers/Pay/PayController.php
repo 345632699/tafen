@@ -97,7 +97,7 @@ class PayController extends BaseController
                         //更新用户的代理等级
                         $client->update(['agent_type_id' => $good_agent_type]);
                     }
-                    $levelOne = Client::where('id', $client->parent_id)->get();
+                    $levelOne = Client::find($client->parent_id);
                     if ($levelOne) {
                         //更新上一级用户资金  正常更新上一级的资金流水
                         if ($levelOne->agent_type_id > 3) {
