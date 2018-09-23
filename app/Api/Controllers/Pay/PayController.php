@@ -120,7 +120,7 @@ class PayController extends BaseController
                     $orderUpdate['order_status'] = 1;
                     $orderUpdateres = $order->update($orderUpdate);
                     Log::info("========微信支付=========");
-                    Log::error('订单支付成功，更新状态:'.$orderUpdateres."订单号：".$out_trade_no);
+                    Log::info('订单支付成功，更新状态:' . $orderUpdateres . "订单号：" . $out_trade_no);
                     Log::info("========微信支付=========");
                     // 用户支付失败
                 } elseif (array_get($message, 'result_code') === 'FAIL') {
@@ -380,7 +380,7 @@ class PayController extends BaseController
         if ($id > 0) {
             \Log::info($parent_id . "冻结金额增加成功，金额为：" . $record['amount']);
         }
-        $amount = \DB::table('client_amount')->where('client_id', $parent_id)->get();
+        $amount = \DB::table('client_amount')->where('client_id', $parent_id)->first();
         $amount->update(['amount', $amount->amount + $spread_amount]);
     }
 
@@ -389,8 +389,8 @@ class PayController extends BaseController
     {
         $oneSql = 'select * from xm_client_link_treepaths where dist=1 and path_end_client_id=' . $client_id . ' and month(created_at)=month(now())';
         $twoSql = 'select * from xm_client_link_treepaths where dist=2 and path_end_client_id=' . $client_id . ' and month(created_at)=month(now())';
-        $oneCount = \DB::select($oneSql)->count();
-        $twoCount = \DB::select($twoSql)->count();
+        $oneCount = count(\DB::select($oneSql));
+        $twoCount = count(\DB::select($twoSql));
         if ($oneCount >= 30 && $twoCount >= 60) {
             return true;
         } else {
