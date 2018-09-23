@@ -84,9 +84,13 @@ class ClientRepository implements ClientRepositoryInterface
                     \DB::table('client_link_treepaths')->insert($insert);
                     //插入自身的一条记录
                     $this->insertSelfNode($client_id);
-
+                    // 更新parent_id
+                    $res = Client::find($client_id)->update(['parent_id' => $parent_id]);
+                    if ($res) {
+                        \Log::info($client_id . '的pareent_id更新成功为' . $parent_id);
+                    }
                     //添加 推广人的冻结资金
-                    $this->updateFrozenAmount($client_id,$parent_id);
+//                    $this->updateFrozenAmount($client_id,$parent_id);
 
                 }else{
                     $this->insertSelfNode($client_id);

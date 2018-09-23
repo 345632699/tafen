@@ -43,7 +43,6 @@ class PayController extends BaseController
             $out_trade_no = $message['out_trade_no'];
             $pay_bills = \DB::table("pay_bills")->where('pay_order_number',$out_trade_no);
 //            传递parent_id
-            $parent_id = \DB::table("pay_bills")->where("order_header_id",$pay_bills->first()->order_header_id)->first()->parent_id;
             if (!$pay_bills) { // 如果订单不存在
                 Log::info("========微信支付=========");
                 Log::error('Order not exist.'."订单号：".$out_trade_no);
@@ -58,6 +57,7 @@ class PayController extends BaseController
             }
 
             if ($message['return_code'] === 'SUCCESS') { // return_code 表示通信状态，不代表支付状态
+                $parent_id = $pay_bills->first()->parent_id;
                 // 用户是否支付成功
                 if (array_get($message, 'result_code') === 'SUCCESS') {
                     $order = Order::find($pay_bills->first()->order_header_id);
@@ -83,7 +83,7 @@ class PayController extends BaseController
 
                     // 判断商品 是否代理商品
                     $order_lines = Order::select('ol.good_id', 'ol.last_price')
-                        ->rightJoin('order_lines ol', 'ol.header_id', '=', 'order_headers.uid')
+                        ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
@@ -100,20 +100,17 @@ class PayController extends BaseController
                     $levelOne = Client::where('id', $client->parent_id)->get();
                     if ($levelOne) {
                         //更新上一级用户资金  正常更新上一级的资金流水
-                        $this->updateAmount($order_lines, $client_id, $parent_id);
-                        // 查找上二级用户 存在且为销售员
-                        $levelTow = Client::find($levelOne->parent_id);
-                        if ($levelTow && $levelTow->agent_type_id > 3) {
-                            $levelTowId = $levelTow->id;
-                            $rate = 0.08;
-                            if ($this->isConmplete($levelTowId)) {
-                                $rate = 0.1;
-                            }
-                            foreach ($order_lines as $order_line) {
-                                $good_agent_type = Good::find($order_line->good_id)->agent_type_id;
-                                if ($good_agent_type == 0) {
-                                    $spread_amount = $order_line->last_price * $rate;
-                                    $this->addFlowRecord($client_id, $levelTowId, $spread_amount, $order_line->good_id);
+                        if ($levelOne->agent_type_id > 3) {
+                            $this->updateEmployeeAmount($order_lines, $client_id, $parent_id);
+                        } else {
+                            $this->updateAmount($order_lines, $client_id, $parent_id);
+                            //如果上级用户不是销售员 则查询上一级的parent_id
+                            // 查找上二级用户 存在且为销售员
+                            if ($levelOne->parent_id > 0) {
+                                $levelTow = Client::find($levelOne->parent_id);
+                                if ($levelTow->agent_type_id > 3) {
+                                    $levelTowId = $levelTow->id;
+                                    $this->updateSecondAmount($order_lines, $client_id, $levelTowId);
                                 }
                             }
                         }
@@ -228,7 +225,6 @@ class PayController extends BaseController
         }
     }
 
-
     /**
      * @api {post} /pay/withdraw_list 提现记录
      * @apiName PayWithdraw
@@ -279,10 +275,9 @@ class PayController extends BaseController
         }
     }
 
+    // 更新上级的余额 非员工
     public function updateAmount($order_lines, $client_id, $parent_id)
     {
-        // 代理等级
-        $parent_agent_type = Client::find($parent_id)->agent_type_id;
         // 员工非员工 正常进行金钱统计 只有一条记录的时候才可能为 代理商品
         if ($order_lines->count() == 1) {
             $good_id = $order_lines[0]->good_id;
@@ -302,42 +297,72 @@ class PayController extends BaseController
                     $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
                     break;
                 default:
-                    // 如果为销售员 根据业绩情况 统计回报率
-                    if ($parent_agent_type > 3) {
-                        if ($this->isConmplete($parent_id)) {
-                            $rate = 0.1;
-                        } else {
-                            $rate = 0.08;
-                        }
-                        $spread_amount = $last_price * $rate;
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
-                    } else {
-                        $rate = 0.1;
-                        $spread_amount = $last_price * $rate;
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
-                    }
+                    $rate = 0.1;
+                    $spread_amount = $last_price * $rate;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
                     break;
             }
         } else {
-            // 如果是销售员工
-            if ($parent_agent_type > 3) {
-                $rate = 0.08;
-                if ($this->isConmplete($parent_id)) {
-                    $rate = 0.1;
-                }
-                foreach ($order_lines as $order_line) {
-                    $spread_amount = $order_line->last_price * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
-                }
-            } else {
-                foreach ($order_lines as $order_line) {
-                    $spread_amount = $order_line->last_price * 0.1;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
-                }
+            foreach ($order_lines as $order_line) {
+                $spread_amount = $order_line->total_price * 0.1;
+                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
             }
+        }
+    }
 
+    // 更新上一级的余额 员工 agent_type_id > 3
+    public function updateEmployeeAmount($order_lines, $client_id, $parent_id)
+    {
+        // 员工非员工 正常进行金钱统计 只有一条记录的时候才可能为 代理商品
+        if ($order_lines->count() == 1) {
+            $good_id = $order_lines[0]->good_id;
+            $last_price = $order_lines[0]->last_price;
+            $quantity = $order_lines[0]->quantity;
+            $good_agent_type = Good::find($good_id)->agent_type_id;
+            if ($this->isConmplete($parent_id)) {
+                $rate = 0.02;
+            } else {
+                $rate = 0;
+            }
+            switch ($good_agent_type) {
+                case 1:
+                    $spread_amount = 5000 * $quantity + $last_price * $quantity * $rate;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    break;
+                case 2:
+                    $spread_amount = 10000 * $quantity + $last_price * $quantity * $rate;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    break;
+                case 3:
+                    $spread_amount = 12000 * $quantity + $last_price * $quantity * $rate;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    break;
+                default:
+                    // 如果为销售员 根据业绩情况 统计回报率
+                    $spread_amount = $last_price * $quantity * 0.1;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    break;
+            }
+        } else {
+            foreach ($order_lines as $order_line) {
+                $spread_amount = $order_line->total_price * 0.1;
+                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+            }
         }
 
+    }
+
+    //更新上两级用户为员工的账户
+    public function updateSecondAmount($order_lines, $client_id, $parent_id)
+    {
+        $rate = 0.08;
+        foreach ($order_lines as $order_line) {
+            $good_agent_type = Good::find($order_line->good_id)->agent_type_id;
+            if ($good_agent_type == 0) {
+                $spread_amount = $order_line->last_price * $rate;
+                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+            }
+        }
     }
 
     private function addFlowRecord($client_id, $parent_id, $spread_amount, $good_id)
