@@ -39,6 +39,11 @@ class OrderRepository implements OrderRepositoryInterface
         $order_header_data['expired_time'] = Carbon::now()->addMinutes(30);
         $order_header_data['shipping_fee'] = $request->get('shipping_fee','0');
         $order_header_data['open_invoice_flag'] = $request->get('open_invoice_flag','N');
+        $contract = Contact::find($request->get('address_id'));
+        $order_header_data['address'] = '';
+        if ($contract) {
+            $order_header_data['address'] = $contract->name . " " . $contract->phone_num . '-' . $contract->province . $contract->city . $contract->area . $contract->address;
+        }
         $order_header = Order::create($order_header_data);
         return $order_header;
     }
@@ -65,7 +70,7 @@ class OrderRepository implements OrderRepositoryInterface
         $contract = Contact::find($request->get('address_id'));
         $order_line_data['address'] = '';
         if ($contract){
-            $order_line_data['address'] = $contract->name . ' ' . $contract->province.$contract->city.$contract->area.$contract->address . " " .$contract->phone_num;
+            $order_line_data['address'] = $contract->name . " " . $contract->phone_num . '-' . $contract->province . $contract->city . $contract->area . $contract->address;
         }
         $order_line = OrderDetail::create($order_line_data);
         return $order_line;
