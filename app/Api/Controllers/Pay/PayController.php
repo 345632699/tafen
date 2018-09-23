@@ -381,7 +381,7 @@ class PayController extends BaseController
             \Log::info($parent_id . "冻结金额增加成功，金额为：" . $record['amount']);
         }
         $amount = \DB::table('client_amount')->where('client_id', $parent_id);
-        $amount->update(['amount', $amount->first()->amount + $spread_amount]);
+        $amount->update(['amount' => $amount->first()->amount + $spread_amount]);
     }
 
     // 是否达标
