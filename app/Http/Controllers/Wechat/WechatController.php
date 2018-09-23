@@ -35,6 +35,13 @@ class WechatController extends Controller
                 'gender' => $decryptedData['gender'],
             ];
             $client = Client::create($newUser);
+            // 创建资金账户
+            $amount = [
+                'client_id' => $client->id,
+                'amount' => 0,
+                'freezing_amount' => 0,
+            ];
+            \DB::table('client_amount')->insert($amount);
         }
         if (isset($client->id)){
             $token = JWTAuth::fromUser($client);
