@@ -720,24 +720,105 @@ class OrderController extends BaseController
         }
     }
 
-
+    /**
+     * @api {post} /order/return 申请退款
+     * @apiName OrderReturn
+     * @apiGroup Order
+     *
+     * @apiHeader (Authorization) {String} authorization Authorization value.
+     *
+     * @apiParam {int} good_status 退货商品状态  退货状态 0 已到货 1 未到货
+     * @apiParam {int} order_id 订单的id 非订单号 是订单的uid
+     * @apiParam {int} return_order_status 退货单状态订单状态，0-提交申请，1-审批拒绝，2-审批通过，3-退货中，4-已完成，5-异常
+     * @apiParam {int} return_reason_type 退货理由类型，0-无理由，1-功能异常，2-商品损坏
+     * @apiParam {string} return_reason 退货具体原因
+     * @apiParam {string} evidence_pic1_url 退货凭证图片1url
+     * @apiParam {string} evidence_pic2_url 退货凭证图片2url
+     * @apiParam {string} evidence_pic3_url 退货凭证图片3url
+     * @apiParam {int} [return_request_type] 退货发起类型，，0-用户发起，我方发起 默认为0
+     * @apiParam {int} [request_client_id] 退货申请人，取自两方面值，当退货发起类型为用户，则为xm_client中的uid，当退货发起类型为我方，则为xm_employees中的uid
+     *
+     * @apiSuccess {Array} data 返回的数据结构体
+     * @apiSuccess {Number} status  1 执行成功 0 为执行失败
+     * @apiSuccess {string} msg 执行信息提示
+     * @apiSuccess {string} return_date 退货到货日期
+     *
+     * @apiSuccessExample Success-Response:
+     * {
+     * "response": {
+     * "data": {
+     * "uid": 4,
+     * "return_order_number": "R_1537695508",
+     * "order_header_id": 10,
+     * "return_request_type": 0,
+     * "return_order_status": 0,
+     * "request_client_id": 22,
+     * "request_date": "2018-09-23 09:38:28",
+     * "return_date": null,
+     * "return_reason_type": 0,
+     * "return_reason": "0",
+     * "evidence_pic1_url": null,
+     * "evidence_pic2_url": null,
+     * "evidence_pic3_url": null,
+     * "good_status": 1,
+     * "update_time": null
+     * },
+     * "status": 1,
+     * "msg": "申请退货成功,等待商家确认"
+     * }
+     * }
+     */
     public function returnMoney(Request $request)
     {
         try {
+            $client_id = session('client.id');
             $data['good_status'] = $request->good_status;
-            $data['order_header_id'] = $request->order_header_id;
+            $data['order_header_id'] = $request->order_id;
             $data['return_order_status'] = $request->return_order_status; // 退货单状态订单状态，见xm_lookup_values表RETURN_ORDER_STATUS：0-提交申请，1-审批拒绝，2-审批通过，3-退货中，4-已完成，5-异常
             $data['return_request_type'] = $request->get('return_request_type', 0); //退货发起类型，，见xm_lookup_values表RETURN_REQUEST_TYPE：0-用户发起，我方发起
             $data['return_order_number'] = 'R_' . time();
             $data['return_reason_type'] = $request->return_reason_type; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
             $data['return_reason'] = $request->return_reason; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
-            $data['request_client_id'] = $request->request_client_id;
+            $data['request_client_id'] = $client_id;
             $data['request_date'] = Carbon::now();
             $res = \DB::table('return_orders')->insertGetId($data);
-            return response_format($res, 1, '申请退货成功', 200);
+            $return_order = \DB::table('return_orders')->where('uid', $res)->first();
+            return response_format($return_order, 1, '申请退货成功,等待商家确认', 200);
         } catch (Exception $e) {
             return response_format([], 0, $e->getMessage(), 501);
         }
+    }
+
+    /**
+     * @api {post} /order/return 申请退款
+     * @apiName OrderReturn
+     * @apiGroup Order
+     *
+     * @apiHeader (Authorization) {String} authorization Authorization value.
+     *
+     * @apiParam {file} img 文件字段名 form表单提交 二进制文件上传
+     *
+     * @apiSuccess {Array} data 返回的数据结构体
+     * @apiSuccess {Number} status  1 执行成功 0 为执行失败
+     * @apiSuccess {string} msg 执行信息提示
+     *
+     * @apiSuccessExample Success-Response:
+     * {
+    "response": {
+    "data": {
+    "path": "/order_return/jsxHtKB2_1537697894card_01.png",
+    "size": "0.27",
+    "file_display": "card_01.png"
+    },
+    "status": 1,
+    "msg": "success"
+    }
+    }
+     */
+    public function uploadImg(Request $request)
+    {
+        $res = upload($request, $request->file()['img']);
+        return response_format($res);
     }
 
 }
