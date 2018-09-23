@@ -46,7 +46,7 @@ class GoodRepository implements GoodRepositoryInterface
                 if(isset($res->discount_rate) && $goods->is_coupon <= 0){
                     $goods->agent_price = $goods->original_price * (100 - $res->discount_rate) / 100;
                 }else{
-                    $goods->agent_price = null;
+                    $goods->agent_price = $goods->original_price * 0.9;
                 }
             }
 //            foreach ($attrList as $attr) {
@@ -65,7 +65,7 @@ class GoodRepository implements GoodRepositoryInterface
                 ->where('agm.good_id', $goods->uid)
                 ->get();
             foreach ($attributes as $item){
-                $item->agent_price = $rate == 100 ? null : $item->original_price * $rate / 100;
+                $item->agent_price = $rate == 100 ? $item->original_price * 0.9 : $item->original_price * $rate / 100;
                 if ($item->is_coupon){
                     $item->last_price = $item->discount_price;
                 }else{
