@@ -27,6 +27,11 @@ class Order extends Model
         'open_invoice_flag',
         'shipping_fee',
         'expired_time',
+        'shipping_status',
+        'shipping_code',
+        'shipping_time',
+        'shipping_name',
+        'address',
         'updated_at',
         'created_at',
     ];
