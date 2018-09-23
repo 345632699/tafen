@@ -55,6 +55,8 @@ $api->version('v1', function ($api) {
             $api->post('order/confirm','Order\OrderController@confirmReceipt');
             $api->post('order/cancel','Order\OrderController@cancelOrder');
             $api->get('order/search', 'Order\OrderController@getOrderList');
+            $api->post('order/return', 'Order\OrderController@returnMoney');
+            $api->post('order/uploadImg', 'Order\OrderController@uploadImg');
 
             $api->post('cart/create','Cart\CartController@addToCart');
             $api->post('cart/update','Cart\CartController@updateCart');
