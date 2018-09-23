@@ -25,7 +25,7 @@ class PayRepository implements PayRepositoryInterface
         //构造微信支付数组
         $payBill['body'] = '小萌商城';
         $payBill['out_trade_no'] = $pay['pay_order_number'];
-        if (config(env('APP_DEBUG'))) {
+        if (env('APP_DEBUG')) {
             $payBill['total_fee'] = 1;
         } else {
             $payBill['total_fee'] = $pay['total_price'];
