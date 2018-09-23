@@ -31,7 +31,7 @@ class PayRepository implements PayRepositoryInterface
             $payBill['total_fee'] = $pay['total_price'];
         }
         $payBill['spbill_create_ip'] = '';
-        $payBill['notify_url'] = 'https://wxapp.honeybot.cn/api/pay/notify';
+        $payBill['notify_url'] = 'https://www.tophena1982.com/api/pay/notify';
         $payBill['trade_type'] = 'JSAPI';
         $payBill['openid'] = $open_id;
         $result = $app->order->unify($payBill);
