@@ -327,26 +327,26 @@ class PayController extends BaseController
             switch ($good_agent_type) {
                 case 1:
                     $spread_amount = 5000 * $quantity + $last_price * $quantity * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     break;
                 case 2:
                     $spread_amount = 10000 * $quantity + $last_price * $quantity * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     break;
                 case 3:
                     $spread_amount = 12000 * $quantity + $last_price * $quantity * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     break;
                 default:
                     // 如果为销售员 根据业绩情况 统计回报率
                     $spread_amount = $last_price * $quantity * 0.1;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     break;
             }
         } else {
             foreach ($order_lines as $order_line) {
                 $spread_amount = $order_line->total_price * 0.1;
-                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line);
             }
         }
 
@@ -360,20 +360,25 @@ class PayController extends BaseController
             $good_agent_type = Good::find($order_line->good_id)->agent_type_id;
             if ($good_agent_type == 0) {
                 $spread_amount = $order_line->last_price * $rate;
-                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+                $level = 2;
+                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line, $level);
             }
         }
     }
 
-    private function addFlowRecord($client_id, $parent_id, $spread_amount, $good_id)
+    private function addFlowRecord($client_id, $parent_id, $spread_amount, $order_line, $level = 1)
     {
 //        $spread_amount = \SystemConfig::$spread_amount;
         $record['client_id'] = $parent_id;
         $record['child_id'] = $client_id;
         $record['amount'] = $spread_amount;
-        $record['good_id'] = $good_id;
-        $record['type'] = 3;
-        $record['memo'] = "提成" . $record['amount'] . "元";
+        $record['good_id'] = $order_line->good_id;
+        $record['order_line_id'] = $order_line->uid;
+        $record['order_header_id'] = $order_line->header_id;
+        $record['quantity'] = $order_line->quantity;
+        $record['type'] = 2;
+        $record['level'] = $level;
+        $record['memo'] = "待审核" . $record['amount'] / 100 . "元";
         $record['updated_at'] = Carbon::now();
         $record['created_at'] = Carbon::now();
         $id = \DB::table('client_amount_flow')->insertGetId($record);
@@ -381,7 +386,10 @@ class PayController extends BaseController
             \Log::info($parent_id . "冻结金额增加成功，金额为：" . $record['amount']);
         }
         $amount = \DB::table('client_amount')->where('client_id', $parent_id);
-        $amount->update(['amount' => $amount->first()->amount + $spread_amount]);
+        $amount->update([
+            'freezing_amount' => $amount->first()->freezing_amount + $spread_amount,
+            'count_all' => $amount->first()->count_all + $spread_amount
+        ]);
     }
 
     // 是否达标

@@ -136,7 +136,7 @@ class ClientController extends BaseController
             $where['type'] = $type;
         }
         $flow_list = \DB::table('client_amount_flow')
-            ->select('clients.nick_name as child_name', 'client_amount_flow.*')
+            ->select('clients.nick_name as child_name', 'client_amount_flow.*', 'clients.avatar_url', 'clients.agent_type_id')
             ->leftJoin('clients', 'clients.id', '=', 'child_id')
             ->where($where)
             ->orderBy('uid', 'desc')
