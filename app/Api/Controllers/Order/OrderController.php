@@ -844,7 +844,7 @@ class OrderController extends BaseController
                 return response_format([], 0, '订单不存在', 200);
             }
         } catch (Exception $e) {
-            return response_format([], 1, $e->getMessage(), 200);
+            return response_format([], 0, $e->getMessage(), 200);
         }
     }
 
