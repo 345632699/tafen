@@ -233,4 +233,23 @@ class ClientController extends BaseController
             return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/' . $path]);
         }
     }
+
+    /**
+     * @api {get} /api/client/amount 获取用户账户详情
+     * @apiName getAmount 获取用户账户详情
+     * @apiGroup Client
+     *
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     * @apiSuccess {int} count_all 总计收入
+     * @apiSuccess {int} freezing_amount 待审核总额
+     * @apiSuccess {int} amount 可提现金额
+     *
+     */
+    public function getAmount()
+    {
+        $clientId = $this->client->getUserByOpenId()->id;
+        $amount = \DB::table('client_amount')->where('client_id', $clientId)->first();
+        return response_format($amount);
+    }
 }

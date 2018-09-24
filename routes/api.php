@@ -71,6 +71,7 @@ $api->version('v1', function ($api) {
             $api->get('client','Client\ClientController@index');
             $api->get('client/check','Client\ClientController@checkBind');
             $api->get('client/flow_list','Client\ClientController@getFlowList');
+            $api->get('client/amount', 'Client\ClientController@getAmount');
             // 获取推广用户列表
             $api->get('get_spread_list', 'Client\ClientController@getChild');
 
