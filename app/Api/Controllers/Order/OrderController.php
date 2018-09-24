@@ -833,7 +833,7 @@ class OrderController extends BaseController
             $order = Order::find($order_id);
             if ($order) {
                 $ids = [0, 4, 8];
-                if (in_array($order->order_status, $ids)) {
+                if (!in_array($order->order_status, $ids)) {
                     return response_format([], 0, '订单尚未完成，无法删除', 200);
                 }
                 $res = Order::destroy($order_id);
