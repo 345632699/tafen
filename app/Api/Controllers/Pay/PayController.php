@@ -85,17 +85,20 @@ class PayController extends BaseController
                     $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
+                    Log::info("=========================更新等级==============");
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
                     }
-
                     // 确定代理等级 根据代理等级进行计算
                     // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师  10 为代理员工
                     $client = Client::find($client_id);
                     $client_agent_type = $client->agent_type_id;
+                    Log::info("当前等级" . $client_agent_type);
+                    Log::info("购买的代理等级" . $good_agent_type);
                     if ($good_agent_type > 0 && $good_agent_type > $client_agent_type) {
                         //更新用户的代理等级
-                        $client->update(['agent_type_id' => $good_agent_type]);
+                        $res = $client->update(['agent_type_id' => $good_agent_type]);
+                        Log::info("更新用户等级" . $res . " " . $good_agent_type);
                     }
                     $levelOne = Client::find($client->parent_id);
                     if ($levelOne) {
