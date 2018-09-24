@@ -203,16 +203,16 @@ class ClientController extends BaseController
         $clientId = $this->client->getUserByOpenId()->id;
         $client_id = $request->get('client_id', $clientId);
         // 获取下一级的推广人员
-        $oneIds = \DB::table('client_link_treepaths')->select('path_begin_client_id')->where([
-            'path_end_client_id' => $client_id,
+        $oneIds = \DB::table('client_link_treepaths')->select('path_end_client_id')->where([
+            'path_begin_client_id' => $client_id,
             'dist' => 1
         ])->get()->pluck('path_begin_client_id')->toArray();
         $oneChildList = Client::whereIn('id', $oneIds)->get();
         // 获取二级推广
-        $twoIds = \DB::table('client_link_treepaths')->select('path_begin_client_id')->where([
-            'path_end_client_id' => $client_id,
+        $twoIds = \DB::table('client_link_treepaths')->select('path_end_client_id')->where([
+            'path_begin_client_id' => $client_id,
             'dist' => 2
-        ])->get()->pluck('path_begin_client_id')->toArray();
+        ])->get()->pluck('path_end_client_id')->toArray();
         $twoChildList = Client::whereIn('id', $twoIds)->get();
         $data['one'] = $oneChildList;
         $data['two'] = $twoChildList;
