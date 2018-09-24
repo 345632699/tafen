@@ -57,6 +57,7 @@ $api->version('v1', function ($api) {
             $api->get('order/search', 'Order\OrderController@getOrderList');
             $api->post('order/return', 'Order\OrderController@returnMoney');
             $api->post('order/uploadImg', 'Order\OrderController@uploadImg');
+            $api->post('order/delete', 'Order\OrderController@delete');
 
             $api->post('cart/create','Cart\CartController@addToCart');
             $api->post('cart/update','Cart\CartController@updateCart');
