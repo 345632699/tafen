@@ -3,6 +3,7 @@
 namespace App\Api\Controllers\Order;
 use App\Api\Controllers\BaseController;
 use App\Model\Cart;
+use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
 use App\Repositories\Order\OrderRepository;
 use App\Repositories\Pay\PayRepository;
@@ -819,6 +820,32 @@ class OrderController extends BaseController
     {
         $res = upload($request, $request->file()['img']);
         return response_format($res);
+    }
+
+    //订单状态，见xm_lookup_values表ORDER_STATUS：0-已下单，1-已支付，2-待发货，3-已发货，4-已完成，5-异常，6-申请退货，7-确认退货，8-已退货
+    public function delete(Request $request)
+    {
+        if (!isset($request->order_id)) {
+            return response_format([], 0, '订单不存在', 200);
+        }
+        try {
+            $order_id = $request->order_id;
+            $order = Order::find($order_id);
+            if ($order) {
+                $ids = [0, 4, 8];
+                if (in_array($order->order_status, $ids)) {
+                    return response_format([], 0, '订单尚未完成，无法删除', 200);
+                }
+                $res = Order::destroy($order_id);
+                if ($res) {
+                    return response_format([], 1, '删除成功', 200);
+                }
+            } else {
+                return response_format([], 0, '订单不存在', 200);
+            }
+        } catch (Exception $e) {
+            return response_format([], 1, $e->getMessage(), 200);
+        }
     }
 
 }

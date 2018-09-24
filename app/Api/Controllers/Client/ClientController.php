@@ -8,6 +8,7 @@ use App\Model\Delivery;
 use App\Model\Good;
 use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 
@@ -250,6 +251,17 @@ class ClientController extends BaseController
     {
         $clientId = $this->client->getUserByOpenId()->id;
         $amount = \DB::table('client_amount')->where('client_id', $clientId)->first();
+        if ($amount) {
+            $weekStart = Carbon::now()->startOfWeek();
+            $weekEnd = Carbon::now()->endOfWeek();
+            $count = \DB::table('client_amount_flow')
+                ->selectRaw('sum(amount) as count')
+                ->whereBetween('created_at', [$weekStart, $weekEnd])
+                ->where('client_id', $clientId)
+                ->where('type', 2)
+                ->first();
+            $amount->weekCome = intval($count->count);
+        }
         return response_format($amount);
     }
 }
