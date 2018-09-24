@@ -122,8 +122,15 @@ class ClientController extends BaseController
      *
      * @apiHeader (Authorization) {String} authorization Authorization value.
      *
-     * @apiParam {int} type 提现类型 1 增加冻结金额 2 可提现金额减少 3 减少冻结金额 4 可提现金额增加
+     * @apiParam {int} type 资金变更类型  1 提现 2 待审核 3 已入账
      * @apiParam {int} limit 返回条数
+     *
+     * @apiSuccess {int} level 1 以及用户 2 二级用户
+     * @apiSuccess {int} quantity 商品数量
+     * @apiSuccess {int} order_line_id 订单行id
+     * @apiSuccess {int} order_header 订单头id
+     * @apiSuccess {int} client_id 用户id
+     * @apiSuccess {int} child_id 关联用户id
      *
      */
     public function getFlowList(Request $request)
@@ -135,7 +142,7 @@ class ClientController extends BaseController
         if ($type) {
             $where['type'] = $type;
         }
-        $flow_list = \DB::table('client_amount_flow')
+        $flow_list = \DB::table('api')
             ->select('clients.nick_name as child_name', 'client_amount_flow.*', 'clients.avatar_url', 'clients.agent_type_id')
             ->leftJoin('clients', 'clients.id', '=', 'child_id')
             ->where($where)
