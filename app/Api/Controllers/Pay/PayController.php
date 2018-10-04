@@ -299,18 +299,18 @@ class PayController extends BaseController
                 case 1:
                     if ($parent->agent_type_id == 1) {
                         $spread_amount = 5000;
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     } elseif ($parent->agent_type_id == 2) {
                         $spread_amount = 5500;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = 17600;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 6000;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = 17600;
                         $this->updateAchievement($parent, $amount);
@@ -320,14 +320,14 @@ class PayController extends BaseController
                     if ($parent->agent_type_id == 2) {
                         $spread_amount = 10000;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = 76600;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 16000;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = 76600;
                         $this->updateAchievement($parent, $amount);
@@ -352,7 +352,7 @@ class PayController extends BaseController
 
                     if ($rate > 0) {
                         $spread_amount = $last_price * $rate;
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     }
                     break;
             }
@@ -370,7 +370,7 @@ class PayController extends BaseController
             if ($rate > 0) {
                 foreach ($order_lines as $order_line) {
                     $spread_amount = $order_line->total_price * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line);
                 }
             }
         }
