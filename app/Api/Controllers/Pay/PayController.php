@@ -479,7 +479,7 @@ class PayController extends BaseController
             $insert['created_at'] = Carbon::now();
             $insert['updated_at'] = Carbon::now();
             $insert['memo'] = '用户业绩增加' . $amount / 100 . '元';
-            DB::table('xm_achievement')->insert($insert);
+            DB::table('achievement')->insert($insert);
         } catch (Exception $e) {
             Log::error("更新用户等级出错" . $e->getMessage());
         }
