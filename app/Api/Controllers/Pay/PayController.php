@@ -467,11 +467,11 @@ class PayController extends BaseController
     private function updateAchievement($parent, $amount)
     {
         try {
-            $parent->update(['achievement', $parent->achievement + $amount]);
+            $parent->update(['achievement' => $parent->achievement + $amount]);
             if ($parent->achievement >= 300000 && $parent->agent_type_id < 3) {
-                $parent->update(['agent_type_id', 3]);
+                $parent->update(['agent_type_id' => 3]);
             } elseif ($parent->achievement >= 500000 && $parent->agent_type_id < 4) {
-                $parent->update(['agent_type_id', 4]);
+                $parent->update(['agent_type_id' => 4]);
             }
             //添加更新记录
             $insert['client_id'] = $parent->id;
