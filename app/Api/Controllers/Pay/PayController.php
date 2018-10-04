@@ -11,10 +11,10 @@ use App\Model\ClientAmount;
 use App\Repositories\Client\ClientRepository;
 use App\Repositories\Pay\PayRepository;
 use Carbon\Carbon;
-use ClassesWithParents\D;
-use EasyWeChat\Payment\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mockery\Exception;
 
 
 class PayController extends BaseController
@@ -90,7 +90,7 @@ class PayController extends BaseController
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
                     }
                     // 确定代理等级 根据代理等级进行计算
-                    // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师  10 为代理员工
+                    // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师 4 领袖  10 为代理员工
                     $client = Client::find($client_id);
                     $client_agent_type = $client->agent_type_id;
                     Log::info("当前等级" . $client_agent_type);
@@ -100,20 +100,27 @@ class PayController extends BaseController
                         $res = $client->update(['agent_type_id' => $good_agent_type]);
                         Log::info("更新用户等级" . $res . " " . $good_agent_type);
                     }
+
+                    //判断逻辑 不应该写在这里  应与方法一同提取出去
                     $levelOne = Client::find($client->parent_id);
                     if ($levelOne) {
                         //更新上一级用户资金  正常更新上一级的资金流水
-                        if ($levelOne->agent_type_id > 3) {
+                        if ($levelOne->agent_type_id == 10) {
                             $this->updateEmployeeAmount($order_lines, $client_id, $parent_id);
                         } else {
                             $this->updateAmount($order_lines, $client_id, $parent_id);
+
                             //如果上级用户不是销售员 则查询上一级的parent_id
                             // 查找上二级用户 存在且为销售员
                             if ($levelOne->parent_id > 0) {
                                 $levelTow = Client::find($levelOne->parent_id);
-                                if ($levelTow->agent_type_id > 3) {
+                                if ($levelTow->agent_type_id == 10) {
                                     $levelTowId = $levelTow->id;
+                                    // 员工
                                     $this->updateSecondAmount($order_lines, $client_id, $levelTowId);
+                                } else {
+                                    // 非员工
+                                    $this->updateSecondPercentage($order_lines, $client_id, $parent_id, $levelTow);
                                 }
                             }
                         }
@@ -281,6 +288,8 @@ class PayController extends BaseController
     // 更新上级的余额 非员工
     public function updateAmount($order_lines, $client_id, $parent_id)
     {
+        $parent = Client::find($parent_id);
+        $client = Client::find($client_id);
         // 员工非员工 正常进行金钱统计 只有一条记录的时候才可能为 代理商品
         if ($order_lines->count() == 1) {
             $good_id = $order_lines[0]->good_id;
@@ -288,27 +297,81 @@ class PayController extends BaseController
             $good_agent_type = Good::find($good_id)->agent_type_id;
             switch ($good_agent_type) {
                 case 1:
-                    $spread_amount = $last_price * 0.1 + 5000;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    if ($parent->agent_type_id == 1) {
+                        $spread_amount = 5000;
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    } elseif ($parent->agent_type_id == 2) {
+                        $spread_amount = 5500;
+                        // 更新冻结金额
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        // 更新业绩
+                        $amount = 17600;
+                        $this->updateAchievement($parent, $amount);
+                    } elseif ($parent->agent_type_id == 3) {
+                        $spread_amount = 6000;
+                        // 更新冻结金额
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        // 更新业绩
+                        $amount = 17600;
+                        $this->updateAchievement($parent, $amount);
+                    }
                     break;
                 case 2:
-                    $spread_amount = $last_price * 0.1 + 10000;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    if ($parent->agent_type_id == 2) {
+                        $spread_amount = 10000;
+                        // 更新冻结金额
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        // 更新业绩
+                        $amount = 76600;
+                        $this->updateAchievement($parent, $amount);
+                    } elseif ($parent->agent_type_id == 3) {
+                        $spread_amount = 16000;
+                        // 更新冻结金额
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                        // 更新业绩
+                        $amount = 76600;
+                        $this->updateAchievement($parent, $amount);
+                    }
                     break;
                 case 3:
-                    $spread_amount = $last_price * 0.1 + 12000;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    // 更新业绩
+                    $amount = 300000;
+                    $this->updateAchievement($parent, $amount);
                     break;
                 default:
-                    $rate = 0.1;
-                    $spread_amount = $last_price * $rate;
-                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    $p_agent_type = $parent->agent_type_id;
+                    $c_agent_type = $client->agent_type_id;
+                    $rate = 0;
+                    if ($p_agent_type > 0) {
+                        $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                        if ($c_agent_type) {
+                            $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                        }
+                        $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
+                    }
+
+                    if ($rate > 0) {
+                        $spread_amount = $last_price * $rate;
+                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $good_id);
+                    }
                     break;
             }
         } else {
-            foreach ($order_lines as $order_line) {
-                $spread_amount = $order_line->total_price * 0.1;
-                $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+            $p_agent_type = $parent->agent_type_id;
+            $c_agent_type = $client->agent_type_id;
+            $rate = 0;
+            if ($p_agent_type > 0) {
+                $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                if ($c_agent_type) {
+                    $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                }
+                $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
+            }
+            if ($rate > 0) {
+                foreach ($order_lines as $order_line) {
+                    $spread_amount = $order_line->total_price * $rate;
+                    $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line->good_id);
+                }
             }
         }
     }
@@ -355,6 +418,37 @@ class PayController extends BaseController
 
     }
 
+    // 更新用户等级为高手及其之上的提成 二级用户提成
+    public function updateSecondPercentage($order_lines, $client_id, $parent_id, $levelTow)
+    {
+        try {
+            $parent = Client::find($parent_id);
+            $client = Client::find($client_id);
+            $p_agent_type = $parent->agent_type_id;
+            $c_agent_type = $client->agent_type_id;
+            $p_p_agent_type = $levelTow->agent_type_id;
+            $rate = 0;
+            if ($p_p_agent_type > 1) {
+                $c_rake_back_rate = 0;
+                $p_p_rake_back_rate = 0;
+                $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                if ($c_agent_type) {
+                    $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                    $p_p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $levelTow->agent_type_id)->first()->rake_back_rate;
+                }
+                $rate = ($p_rake_back_rate - $c_rake_back_rate - $p_p_rake_back_rate) / 100;
+                if ($rate > 0) {
+                    foreach ($order_lines as $order_line) {
+                        $spread_amount = $order_line->total_price * $rate;
+                        $this->addFlowRecord($client_id, $levelTow->id, $spread_amount, $order_line->good_id);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            Log::error('更新二级提成出错' . $e->getMessage());
+        }
+    }
+
     //更新上两级用户为员工的账户
     public function updateSecondAmount($order_lines, $client_id, $parent_id)
     {
@@ -369,6 +463,29 @@ class PayController extends BaseController
         }
     }
 
+    //更新业绩
+    private function updateAchievement($parent, $amount)
+    {
+        try {
+            $parent->update(['achievement', $parent->achievement + $amount]);
+            if ($parent->achievement >= 300000 && $parent->agent_type_id < 3) {
+                $parent->update(['agent_type_id', 3]);
+            } elseif ($parent->achievement >= 500000 && $parent->agent_type_id < 4) {
+                $parent->update(['agent_type_id', 4]);
+            }
+            //添加更新记录
+            $insert['client_id'] = $parent->id;
+            $insert['amount'] = $amount;
+            $insert['created_at'] = Carbon::now();
+            $insert['updated_at'] = Carbon::now();
+            $insert['memo'] = '用户业绩增加' . $amount / 100 . '元';
+            DB::table('xm_achievement')->insert($insert);
+        } catch (Exception $e) {
+            Log::error("更新用户等级出错" . $e->getMessage());
+        }
+    }
+
+    // 更新冻结金额  待审核
     private function addFlowRecord($client_id, $parent_id, $spread_amount, $order_line, $level = 1)
     {
 //        $spread_amount = \SystemConfig::$spread_amount;
