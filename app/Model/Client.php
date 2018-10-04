@@ -16,6 +16,7 @@ class Client extends Authenticatable
         'avatar_url',
         'open_id',
         'gender',
+        'achievement',
         'parent_id',
         'agent_type_id'
     ];
