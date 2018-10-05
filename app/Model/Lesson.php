@@ -12,5 +12,4 @@ class Lesson extends Model
 
     protected $primaryKey = 'id';
 
-
 }

@@ -38,6 +38,8 @@ $api->version('v1', function ($api) {
         $api->get('home','Home\HomeController@index');
         //支付回调
         $api->any('pay/notify','Pay\PayController@payNotify');
+        // 课程
+        $api->get('lesson/list', 'Lesson\LessonController@getLessonList');
 
         //收货地址
         $api->group(['middleware' => ['jwt.auth','scope']], function ($api) {
