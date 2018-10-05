@@ -39,7 +39,7 @@
                                     </td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->quantity }}</td>
-                                    <td>{{ $item->quantity * $item->unit_price  }}</td>
+                                    <td>{{ $item->total_price / 100  }}</td>
                                     <td>
                                         {{ $item->nick_name }}
                                     </td>

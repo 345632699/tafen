@@ -15,10 +15,7 @@
                                 <label>用户名:</label> <span>{{ $order->nick_name }}</span>
                             </p>
                             <p>
-                                <label>收货地址:</label> <span>{{ $delivery->address }}</span>
-                            </p>
-                            <p>
-                                <label>订单备注:</label> <span>{{ $order->buyer_msg }}</span>
+                                <label>收货地址:</label> <span>{{ $order->address }}</span>
                             </p>
                         </div>
                         <hr>
@@ -54,22 +51,24 @@
                                 <thead>
                                     <th>商品名称</th>
                                     <th>型号</th>
-                                    <th>颜色</th>
                                     <th>数量</th>
                                     <th>单价</th>
                                     <th>总价</th>
                                     <th>状态</th>
+                                    <th>订单备注</th>
                                 </thead>
                                 <tbody>
+                                @foreach($good_list as $good)
                                     <tr>
-                                        <th>{{ $good->name }}</th>
-                                        <th>{{ $order->size }}</th>
-                                        <th>{{ $order->color }}</th>
-                                        <th>{{ $order->quantity }}</th>
-                                        <th>{{ $order->unit_price }}</th>
-                                        <th>{{ $order->unit_price * $order->quantity }}</th>
+                                        <th>{{ $good['good_name'] }}</th>
+                                        <th>{{ $good['attr_value'] }}</th>
+                                        <th>{{ $good['quantity'] }}</th>
+                                        <th>{{ $good['last_price'] }}</th>
+                                        <th>{{ $good['total_price'] }}</th>
                                         <th>{{ $order->order_status_name }}</th>
+                                        <th>{{ $good['buyer_msg'] }}</th>
                                     </tr>
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -77,10 +76,7 @@
                         <div>
                             <p>快递信息</p>
                             <p>
-                                <label>快递单号:</label> <span>{{ $delivery->delivery_number }}</span>
-                            </p>
-                            <p>
-                                <label>机器人序列号:</label> <span>{{ $product_ids }}</span>
+                                <label>快递单号:</label> <span>{{ $order->shipping_code }}</span>
                             </p>
                         </div>
                         <div>

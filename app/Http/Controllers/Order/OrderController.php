@@ -24,7 +24,7 @@ class OrderController extends Controller
         if ($order_status >= 0){
             $where['order_status'] = $order_status;
         }
-        $orderList = Order::select('order_headers.*','color','quantity','combo_id','ol.unit_price','good_id','goods.name','nick_name')
+        $orderList = Order::select('order_headers.*', 'quantity', 'ol.total_price', 'good_id', 'goods.name', 'nick_name')
             ->leftJoin('order_lines as ol','order_headers.uid','=','ol.header_id')
             ->leftJoin('goods','goods.uid','=','ol.good_id')
             ->leftJoin('clients','clients.id','=','order_headers.client_id')
@@ -79,18 +79,14 @@ class OrderController extends Controller
 
     public function show($order_id){
         $data = $this->order->getOrderDetail($order_id);
-        $order = $data['order'] ;
-        $good = $data['good'] ;
-        $address = $data['address'] ;
-        $delivery = $data['delivery'] ;
-        $invoice = $data['invoice'] ;
-        $product_ids = implode(',',$data['product_ids']);
+        $order = $data;
+        $good_list = $data->good_list;
+        $address = $data->address;
+        $invoice = [];
         return view('admin.order.detail',compact(
             'order',
             'address',
-            'good',
-            'delivery',
-            'product_ids',
+                'good_list',
             'invoice')
         );
     }
@@ -110,18 +106,12 @@ class OrderController extends Controller
     public function updateDelivery(Request $request){
         $delivery_name = $request->name;
         $delivery_number = $request->delivery_number;
-        $delivery_number = $delivery_name. " " .$delivery_number;
         $order_id = $request->order_id;
-        $delivery = Delivery::where('order_header_id',$order_id)->first();
-        $res = $delivery->update(['delivery_number'=>$delivery_number]);
-
-        $product_ids = explode(',',$request->product_ids);
-        foreach ($product_ids as $key=>$id){
-            $insertData[$key]['delivery_id'] = $delivery->uid;
-            $insertData[$key]['product_id'] = $id;
-            $insertData[$key]['updated_at'] = Carbon::now();
-        }
-        \DB::table('delivery_products')->insert($insertData);
+        $update['shipping_code'] = $delivery_number;
+        $update['shipping_time'] = Carbon::now();
+        $update['shipping_name'] = $delivery_name;
+        $update['shipping_status'] = 1;
+        Order::where('uid', $order_id)->update($update);
 
         return redirect()->route('order.show',$order_id);
 

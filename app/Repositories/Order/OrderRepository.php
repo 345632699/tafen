@@ -218,8 +218,10 @@ class OrderRepository implements OrderRepositoryInterface
                     'pay_type',
                     'pay_name',
                     'pay_date',
-                    'shipping_fee'
+                    'shipping_fee',
+                    'nick_name'
                 )
+                ->leftJoin('clients', 'id', '=', 'order_headers.client_id')
                 ->where('uid',$order_id)->get()->first();
 
 
@@ -228,7 +230,7 @@ class OrderRepository implements OrderRepositoryInterface
                 ->leftJoin('attr_good_mapping as agm','agm.id','=','attr_good_mapping_id')
                 ->leftJoin('attributes as attr','attr.id','=','agm.attr_id')
                 ->leftJoin('goods','goods.uid','=','ol.good_id')
-                ->where('order_headers.uid',$order_id)->get();
+                ->where('order_headers.uid', $order_id)->get()->toArray();
             $order->good_list = $list;
 
             //订单状态，见xm_lookup_values表ORDER_STATUS：0-已下单，1-已支付，2-待发货，3-已发货，4-已完成，5-异常，6-申请退货，7-确认退货，8-已退货
