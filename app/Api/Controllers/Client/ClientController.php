@@ -206,7 +206,7 @@ class ClientController extends BaseController
         $oneIds = \DB::table('client_link_treepaths')->select('path_end_client_id')->where([
             'path_begin_client_id' => $client_id,
             'dist' => 1
-        ])->get()->pluck('path_begin_client_id')->toArray();
+        ])->get()->pluck('path_end_client_id')->toArray();
         $oneChildList = Client::whereIn('id', $oneIds)->get();
         // 获取二级推广
         $twoIds = \DB::table('client_link_treepaths')->select('path_end_client_id')->where([
