@@ -343,9 +343,9 @@ class PayController extends BaseController
                     $c_agent_type = $client->agent_type_id;
                     $rate = 0;
                     if ($p_agent_type > 0) {
-                        $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                        $p_rake_back_rate = \DB::table('agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
                         if ($c_agent_type) {
-                            $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                            $c_rake_back_rate = \DB::table('agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
                         }
                         $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
                     }
@@ -361,9 +361,9 @@ class PayController extends BaseController
             $c_agent_type = $client->agent_type_id;
             $rate = 0;
             if ($p_agent_type > 0) {
-                $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                $p_rake_back_rate = \DB::table('agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
                 if ($c_agent_type) {
-                    $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                    $c_rake_back_rate = \DB::table('agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
                 }
                 $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
             }
@@ -431,10 +431,10 @@ class PayController extends BaseController
             if ($p_p_agent_type > 1) {
                 $c_rake_back_rate = 0;
                 $p_p_rake_back_rate = 0;
-                $p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
+                $p_rake_back_rate = \DB::table('agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
                 if ($c_agent_type) {
-                    $c_rake_back_rate = \DB::table('xm_agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
-                    $p_p_rake_back_rate = \DB::table('xm_agent_type')->where('id', $levelTow->agent_type_id)->first()->rake_back_rate;
+                    $c_rake_back_rate = \DB::table('agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
+                    $p_p_rake_back_rate = \DB::table('agent_type')->where('id', $levelTow->agent_type_id)->first()->rake_back_rate;
                 }
                 $rate = ($p_rake_back_rate - $c_rake_back_rate - $p_p_rake_back_rate) / 100;
                 if ($rate > 0) {
