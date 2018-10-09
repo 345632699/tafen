@@ -342,6 +342,8 @@ class PayController extends BaseController
                     $p_agent_type = $parent->agent_type_id;
                     $c_agent_type = $client->agent_type_id;
                     $rate = 0;
+                    $c_rake_back_rate = 0;
+                    $p_rake_back_rate = 0;
                     if ($p_agent_type > 0) {
                         $p_rake_back_rate = \DB::table('agent_type')->where('id', $p_agent_type)->first()->rake_back_rate;
                         if ($c_agent_type) {
