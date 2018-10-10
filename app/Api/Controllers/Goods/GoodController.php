@@ -282,7 +282,7 @@ class GoodController extends BaseController
             $where['is_coupon'] = $is_coupon;
         }
         $category = Category::find($cat_id);
-        $good_list = Good::where($where)->paginate($limit);
+        $good_list = Good::where($where)->orderBy('sort')->paginate($limit);
         $this->improveGoodList($good_list);
         $resData['category'] = $category;
         $resData['good_list'] = $good_list;
