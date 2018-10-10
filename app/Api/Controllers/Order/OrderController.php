@@ -2,6 +2,7 @@
 
 namespace App\Api\Controllers\Order;
 use App\Api\Controllers\BaseController;
+use App\Client;
 use App\Model\Cart;
 use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
@@ -651,6 +652,9 @@ class OrderController extends BaseController
      */
     public function getWxPayConfig(Request $request){
         $client = $this->client->getUserByOpenId();
+        if ($client->agent_type_id == 10) {
+            return response_format([]);
+        }
         $order_header_id = $request->order_id;
         $parent_id = $request->parent_id;
         $payJssdk = $this->getPayJssdk($order_header_id,$client,$parent_id);
