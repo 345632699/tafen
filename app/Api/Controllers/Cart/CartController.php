@@ -131,6 +131,9 @@ class CartController extends BaseController
             return response_format([],0,'购物车不存在');
         }
         if (isset($request->number)){
+            if ($number >= 5) {
+                $number = 5;
+            }
             $update['number'] = $number;
             $update['total_price'] = $cart->last_price * $number;
         }
