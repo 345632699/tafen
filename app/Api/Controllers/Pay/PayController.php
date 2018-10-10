@@ -109,7 +109,7 @@ class PayController extends BaseController
 //                            $this->updateEmployeeAmount($order_lines, $client_id, $parent_id);
                         } else {
                             $this->updateAmount($order_lines, $client_id, $parent_id);
-
+                            Log::info("一级用户 更新完毕");
                             //如果上级用户不是销售员 则查询上一级的parent_id
                             // 查找上二级用户 存在且为销售员
                             if ($levelOne->parent_id > 0) {
@@ -121,6 +121,7 @@ class PayController extends BaseController
                                 } else {
                                     // 非员工
                                     $this->updateSecondPercentage($order_lines, $client_id, $parent_id, $levelTow);
+                                    Log::info("二级用户 更新完毕");
                                 }
                             }
                         }
@@ -442,7 +443,9 @@ class PayController extends BaseController
                 if ($rate > 0) {
                     foreach ($order_lines as $order_line) {
                         $spread_amount = $order_line->total_price * $rate;
-                        $this->addFlowRecord($client_id, $levelTow->id, $spread_amount, $order_line->good_id);
+                        $this->addFlowRecord($client_id, $levelTow->id, $spread_amount, $order_line);
+                        // 更新用户
+                        Log::info("用户ID" . $client_id . "用户金额" . $spread_amount);
                     }
                 }
             }
