@@ -624,7 +624,7 @@ class GoodController extends BaseController
                 if(isset($res->discount_rate) && $good->is_coupon <= 0){
                     $good->agent_price = ($good->original_price * (100 - $res->discount_rate) / 100);
                 }else{
-                    $good->agent_price = $good->original_price * 0.9;
+                    $good->agent_price = $good->original_price * $rate / 100;
                 }
                 if ($good->is_coupon){
                     $good->last_price = $good->discount_price;

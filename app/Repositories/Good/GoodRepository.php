@@ -41,20 +41,14 @@ class GoodRepository implements GoodRepositoryInterface
             //代理价格
             $client_id = session('client.id');
             if ($client_id) {
-                $res = Client::select('discount_rate')->leftJoin('agent_type','agent_type.id','=','agent_type_id')
-                                    ->where('clients.id',$client_id)->first();
-                if(isset($res->discount_rate) && $goods->is_coupon <= 0){
-                    $goods->agent_price = $goods->original_price * (100 - $res->discount_rate) / 100;
-                }else{
-                    $goods->agent_price = $goods->original_price * 0.9;
-                }
+                $rate = $this->client->getAgentRate($client_id);
+                $goods->agent_price = $goods->original_price * $rate / 100;
             }
 //            foreach ($attrList as $attr) {
 //                $attrRes[$attr->attr_id]['attr_list'][] = $attr;
 //                $attrRes[$attr->attr_id]['name'] = $attrRes[$attr->attr_id]['attr_list'][0]->name;
 //            }
 //            $goods->attr = array_values($attrRes);
-            $rate = $this->client->getAgentRate($client_id);
             if ($goods->is_coupon){
                 $goods->last_price = $goods->discount_price;
             }else{
