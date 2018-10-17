@@ -322,6 +322,14 @@ class PayController extends BaseController
                         $spread_amount = 10000;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        $parent = Client::find($parent_id);
+                        if ($parent->parent_id) {
+                            $p_parent = Client::find($parent->parent_id);
+                            if ($p_parent->agent_type_id == 3) {
+                                $spread_amount = 6000;
+                                $this->addFlowRecord($client_id, $parent->parent_id, $spread_amount, $order_lines[0]);
+                            }
+                        }
                         // 更新业绩
                         $amount = 76600;
                         $this->updateAchievement($parent, $amount);
