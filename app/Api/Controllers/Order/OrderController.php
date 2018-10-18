@@ -2,7 +2,6 @@
 
 namespace App\Api\Controllers\Order;
 use App\Api\Controllers\BaseController;
-use App\Client;
 use App\Model\Cart;
 use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
@@ -481,7 +480,7 @@ class OrderController extends BaseController
     "msg": "success"
     }
     }
- */
+     */
     public function create(Request $request){
         $client = $this->client->getUserByOpenId();
         $client_id = $client->id;
@@ -785,9 +784,16 @@ class OrderController extends BaseController
             $data['return_reason_type'] = $request->return_reason_type; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
             $data['return_reason'] = $request->return_reason; // 退货理由类型，见xm_lookup_values表RETURN_REASON_TYPE：0-无理由，1-功能异常，2-硬件损坏
             $data['request_client_id'] = $client_id;
+            $data['evidence_pic1_url'] = $request->evidence_pic1_url;
+            $data['return_sum'] = $request->return_sum;
+            $data['return_phone'] = $request->return_phone;
+            $data['evidence_pic2_url'] = $request->evidence_pic2_url;
+            $data['evidence_pic3_url'] = $request->evidence_pic3_url;
             $data['request_date'] = Carbon::now();
             $res = \DB::table('return_orders')->insertGetId($data);
             $return_order = \DB::table('return_orders')->where('uid', $res)->first();
+            // 更新状态
+            Order::find( $data['order_header_id'])->update(['order_status'=>6]);
             return response_format($return_order, 1, '申请退货成功,等待商家确认', 200);
         } catch (Exception $e) {
             return response_format([], 0, $e->getMessage(), 501);
@@ -809,16 +815,16 @@ class OrderController extends BaseController
      *
      * @apiSuccessExample Success-Response:
      * {
-    * "response": {
-    * "data": {
-    * "path": "/order_return/jsxHtKB2_1537697894card_01.png",
-    * "size": "0.27",
-    * "file_display": "card_01.png"
-    * },
-    * "status": 1,
-    * "msg": "success"
-    * }
-    * }
+     * "response": {
+     * "data": {
+     * "path": "/order_return/jsxHtKB2_1537697894card_01.png",
+     * "size": "0.27",
+     * "file_display": "card_01.png"
+     * },
+     * "status": 1,
+     * "msg": "success"
+     * }
+     * }
      */
     public function uploadImg(Request $request)
     {
