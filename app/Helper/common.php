@@ -11,9 +11,9 @@ function response_format($data,$status=1,$msg='success',$code = 200){
 
 function upload($request, $file)
 {
-    if (!is_dir(public_path() . '/order_return/')) {
-        mkdir(public_path() . '/order_return/', 0777, true);
-    }
+//    if (!is_dir(public_path() . '/order_return/')) {
+//        mkdir(public_path() . '/order_return/', 0777, true);
+//    }
     // 获取文件相关信息
     $originalName = $file->getClientOriginalName(); // 文件原名
     $ext = $file->getClientOriginalExtension();     // 扩展名
