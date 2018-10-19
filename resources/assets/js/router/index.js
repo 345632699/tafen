@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import GoodCreate from '../components/Good/Create.vue'
+import Hello from '../components/Hello.vue'
 Vue.use(VueRouter);
 
 export default new VueRouter({
@@ -8,7 +10,12 @@ export default new VueRouter({
     {
       name: 'hello',
       path: '/hello',
-      component: resolve => void(require(['../components/Hello.vue'], resolve))
+      component: Hello
+    },
+    {
+      name: 'create',
+      path: '/create',
+      component: GoodCreate
     }
   ]
 });
