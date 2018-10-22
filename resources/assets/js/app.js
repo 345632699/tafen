@@ -20,6 +20,22 @@ window.Vue = require('vue');
 import App from './App.vue';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+// import {
+//   Table, TableColumn, Row, Col,
+//   Input,
+//   Button,
+//   Upload,
+//   Form
+// } from 'element-ui'
+//
+// [
+//   Table, TableColumn, Row, Col,
+//   Input,
+//   Button,
+//   Upload,
+//   Form
+// ].forEach(Compo => Vue.use(Compo));
+
 Vue.use(ElementUI);
 
 import router from './router/index.js';

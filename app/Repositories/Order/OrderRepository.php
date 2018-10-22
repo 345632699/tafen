@@ -164,6 +164,8 @@ class OrderRepository implements OrderRepositoryInterface
 
 
         foreach ($order_list['data'] as $order){
+            if ($order->expired_time < Carbon::now()) {
+            }
             $list = Order::select('ol.*','goods.name as good_name','goods.thumbnail_img','goods.description','attr.name as attr_name','agm.name as attr_value')
                 ->rightJoin('order_lines as ol','ol.header_id','=','order_headers.uid')
                 ->leftJoin('attr_good_mapping as agm','agm.id','=','attr_good_mapping_id')

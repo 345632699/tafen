@@ -40,4 +40,6 @@ Route::any('good_detail','\App\Api\Controllers\Goods\GoodController@index');
 Route::get('spread_list', 'Employee\EmplyeeController@spreadList');
 Route::get('employee_list', 'Employee\EmplyeeController@all');
 
+Route::post('banner/upload', 'Banner\BannerController@upload');
+
 
