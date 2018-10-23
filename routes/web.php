@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/adminHome', 'HomeController@index')->name('home');
 
 //...
 Route::group(['middleware' => ['web']], function () {
@@ -41,5 +41,8 @@ Route::get('spread_list', 'Employee\EmplyeeController@spreadList');
 Route::get('employee_list', 'Employee\EmplyeeController@all');
 
 Route::post('banner/upload', 'Banner\BannerController@upload');
+
+// 个人中心
+
 
 

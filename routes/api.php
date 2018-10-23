@@ -16,10 +16,14 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/clientList', 'Client\ClientController@getList');
+    Route::post('/client/update', 'Client\ClientController@update');
+});
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
-    $api->group(['namespace' => 'App\Api\Controllers','middleware' => ['client.change']], function ($api) {
+    $api->group(['namespace' => 'App\Api\Controllers', 'middleware' => ['client.change']], function ($api) {
         $api->post('user/login', 'AuthController@authenticate');  //登录授权
         $api->post('user/register', 'AuthController@register');
         $api->group(['middleware' => 'jwt.auth'], function ($api) {
@@ -33,62 +37,61 @@ $api->version('v1', function ($api) {
         });
 
 
-
         //首页路由
-        $api->get('home','Home\HomeController@index');
+        $api->get('home', 'Home\HomeController@index');
         //支付回调
-        $api->any('pay/notify','Pay\PayController@payNotify');
+        $api->any('pay/notify', 'Pay\PayController@payNotify');
         // 课程
         $api->get('lesson/list', 'Lesson\LessonController@getLessonList');
 
         //收货地址
-        $api->group(['middleware' => ['jwt.auth','scope']], function ($api) {
-            $api->get('address/list','Address\AddressController@index');
-            $api->get('address/get','Address\AddressController@get');
-            $api->post('address/create','Address\AddressController@create');
-            $api->post('address/edit','Address\AddressController@edit');
-            $api->post('address/delete','Address\AddressController@delete');
+        $api->group(['middleware' => ['jwt.auth', 'scope']], function ($api) {
+            $api->get('address/list', 'Address\AddressController@index');
+            $api->get('address/get', 'Address\AddressController@get');
+            $api->post('address/create', 'Address\AddressController@create');
+            $api->post('address/edit', 'Address\AddressController@edit');
+            $api->post('address/delete', 'Address\AddressController@delete');
 
-            $api->get('order/list','Order\OrderController@getOrderList');
-            $api->get('order/get','Order\OrderController@get');
-            $api->post('order/create','Order\OrderController@create');
-            $api->post('order/cart','Order\OrderController@createFromCart'); //购物车选中下单
-            $api->post('order/wxpaysdk','Order\OrderController@getWxPayConfig'); // 获取微信支付SDK
-            $api->post('order/confirm','Order\OrderController@confirmReceipt');
-            $api->post('order/cancel','Order\OrderController@cancelOrder');
+            $api->get('order/list', 'Order\OrderController@getOrderList');
+            $api->get('order/get', 'Order\OrderController@get');
+            $api->post('order/create', 'Order\OrderController@create');
+            $api->post('order/cart', 'Order\OrderController@createFromCart'); //购物车选中下单
+            $api->post('order/wxpaysdk', 'Order\OrderController@getWxPayConfig'); // 获取微信支付SDK
+            $api->post('order/confirm', 'Order\OrderController@confirmReceipt');
+            $api->post('order/cancel', 'Order\OrderController@cancelOrder');
             $api->get('order/search', 'Order\OrderController@getOrderList');
             $api->post('order/return', 'Order\OrderController@returnMoney');
             $api->post('order/uploadImg', 'Order\OrderController@uploadImg');
             $api->post('order/delete', 'Order\OrderController@delete');
 
-            $api->post('cart/create','Cart\CartController@addToCart');
-            $api->post('cart/update','Cart\CartController@updateCart');
-            $api->post('cart/delete','Cart\CartController@deleteCart');
+            $api->post('cart/create', 'Cart\CartController@addToCart');
+            $api->post('cart/update', 'Cart\CartController@updateCart');
+            $api->post('cart/delete', 'Cart\CartController@deleteCart');
             $api->get('cart/cart_list', 'Cart\CartController@cart_list');
             $api->get('/guessLike', 'Cart\CartController@guessLike');
 
         });
 
         //用户中心
-        $api->group(['middleware' => ['jwt.auth','scope']], function ($api) {
-            $api->get('client','Client\ClientController@index');
-            $api->get('client/check','Client\ClientController@checkBind');
-            $api->get('client/flow_list','Client\ClientController@getFlowList');
+        $api->group(['middleware' => ['jwt.auth', 'scope']], function ($api) {
+            $api->get('client', 'Client\ClientController@index');
+            $api->get('client/check', 'Client\ClientController@checkBind');
+            $api->get('client/flow_list', 'Client\ClientController@getFlowList');
             $api->get('client/amount', 'Client\ClientController@getAmount');
             // 获取推广用户列表
             $api->get('get_spread_list', 'Client\ClientController@getChild');
 
             //提现记录
-            $api->post('pay/withdraw_list','Pay\PayController@getWithDrawRecordList');
+            $api->post('pay/withdraw_list', 'Pay\PayController@getWithDrawRecordList');
             //提现
-            $api->post('pay/withdraw','Pay\PayController@withdraw');
+            $api->post('pay/withdraw', 'Pay\PayController@withdraw');
 
             //商品路由
-            $api->get('good','Goods\GoodController@index');
+            $api->get('good', 'Goods\GoodController@index');
             //商品搜索
             $api->get('good/search', 'Goods\GoodController@search');
             //商品分类列表
-            $api->get('cat_goods','Goods\GoodController@categoryGoodsList');
+            $api->get('cat_goods', 'Goods\GoodController@categoryGoodsList');
             //获取二维码
             $api->get('getQrcode', 'Client\ClientController@getQrcode');
 
