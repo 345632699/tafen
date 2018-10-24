@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="client-list">
+    <h1>用户列表</h1>
     <el-table
         :data="client_list"
         style="width: 100%">
@@ -196,5 +197,8 @@
 </script>
 
 <style scoped>
-
+  .client-list {
+    max-width: 1280px;
+    margin: auto;
+  }
 </style>
