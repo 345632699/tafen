@@ -19,6 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/clientList', 'Client\ClientController@getList');
     Route::post('/client/update', 'Client\ClientController@update');
+    Route::get('/banner/goods', 'Banner\BannerController@getGoodList');
+    Route::post('/banner/create', 'Banner\BannerController@create');
+    Route::post('/banner/update', 'Banner\BannerController@update');
+    Route::post('/banner/delete', 'Banner\BannerController@deleteBanner');
+    Route::get('/banner/list', 'Banner\BannerController@getList');
 });
 
 $api = app('Dingo\Api\Routing\Router');

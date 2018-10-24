@@ -1,12 +1,13 @@
 <?php
 
-function response_format($data,$status=1,$msg='success',$code = 200){
+function response_format($data, $status = 1, $msg = 'success', $code = 200)
+{
     $res = [];
     $res['data'] = $data;
     $res['status'] = $status;
     $res['msg'] = $msg;
 //    return json_encode($res,JSON_UNESCAPED_UNICODE);
-    return response()->json(['response' => $res], $code,[],JSON_UNESCAPED_UNICODE);
+    return response()->json(['response' => $res], $code, [], JSON_UNESCAPED_UNICODE);
 }
 
 function upload($request, $file, $file_path = "/order_return/")
@@ -36,4 +37,14 @@ function upload($request, $file, $file_path = "/order_return/")
     $input = ['path' => $file_path . $filename, 'size' => "$totaltsize", 'file_display' => "$originalName"];
 
     return $input;
+}
+
+function resJson($data, $status = 1, $msg = 'success')
+{
+    $res = [
+        'status' => $status,
+        'data' => $data,
+        'msg' => $msg,
+    ];
+    return json_encode($res, JSON_UNESCAPED_UNICODE);
 }

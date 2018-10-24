@@ -16,6 +16,8 @@
                         <a href="{{ route('order.index') }}">查看所有订单</a>
                         <br>
                         <a href="/#/client/list">查看所有用户</a>
+                        <br>
+                        <a href="/#/banner/list">查看广告banner</a>
                     </div>
                 </div>
             </div>
