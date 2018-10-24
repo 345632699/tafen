@@ -196,7 +196,8 @@ class PayController extends BaseController
                     $amount->update($update);
                     $this->pay->withDraw($res->uid,$client,$amount);
                 }
-                $this->addFlowLog($client_id,null,$withdraw_amount,2);
+                //提现
+                $this->addFlowLog($client_id, null, $withdraw_amount, 4);
                 return response_format($res);
 
             }else{
@@ -213,11 +214,12 @@ class PayController extends BaseController
      * @param $amount
      * @param $type 1 增加冻结金额 2 可提现金额减少 3 减少冻结金额 4 可提现金额增加
      */
-    public function addFlowLog($client_id,$child_id = null,$amount,$type){
+    public function addFlowLog($client_id, $child_id = null, $amount, $type = 2)
+    {
         $record['client_id'] = $client_id;
         $record['child_id'] = $child_id;
         $record['amount'] = $amount;
-        $record['type'] = 2;
+        $record['type'] = $type;
         $client = Client::find($client_id);
         if ($type == 1){
             $record['memo'] = $client->nick_name."增加冻结金额".$record['amount']."元";
