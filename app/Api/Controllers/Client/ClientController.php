@@ -140,8 +140,10 @@ class ClientController extends BaseController
         $client_id = $this->client->getUserByOpenId()->id;
         $type = $request->get('type', 2);
         $where['client_id'] = $client_id;
-        if ($type) {
+        if ($type > 0) {
             $where['type'] = $type;
+        } else {
+            $where['type'] = 2;
         }
         $flow_list = \DB::table('client_amount_flow')
             ->select('clients.nick_name as child_name', 'client_amount_flow.*', 'clients.avatar_url', 'clients.agent_type_id')
