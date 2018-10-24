@@ -138,7 +138,7 @@ class ClientController extends BaseController
     {
         $limit = $request->get('limit', 20);
         $client_id = $this->client->getUserByOpenId()->id;
-        $type = $request->get('type', 0);
+        $type = $request->get('type', 2);
         $where['client_id'] = $client_id;
         if ($type) {
             $where['type'] = $type;
