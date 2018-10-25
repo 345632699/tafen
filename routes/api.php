@@ -25,6 +25,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/banner/delete', 'Banner\BannerController@deleteBanner');
     Route::get('/banner/list', 'Banner\BannerController@getList');
 });
+Route::get('/good/getAttr', 'Good\GoodController@goodAttr');
+Route::post('/good/create', 'Good\GoodController@create');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {

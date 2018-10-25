@@ -19,7 +19,7 @@ export default new VueRouter({
     },
     {
       name: 'create',
-      path: '/create',
+      path: '/good/create',
       component: GoodCreate
     },
     {
