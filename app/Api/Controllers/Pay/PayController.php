@@ -6,6 +6,7 @@ use App\Api\Controllers\BaseController;
 use App\Model\Client;
 use App\Model\Good;
 use App\Model\Order;
+use App\Model\OrderDetail;
 use App\Model\WithdrawRecord;
 use App\Model\ClientAmount;
 use App\Repositories\Client\ClientRepository;
@@ -39,6 +40,7 @@ class PayController extends BaseController
         $response = $app->handlePaidNotify(function ($message, $fail) {
             // 你的逻辑
             Log::info("wechat-notify:".$message['out_trade_no']);
+            Log::info("wechat-notify-message:" . json_encode($message));
             file_put_contents(storage_path('logs/pay.log'),"支付单号：".$message['out_trade_no']."支付结果：".$message['return_code'].PHP_EOL,FILE_APPEND);
             $out_trade_no = $message['out_trade_no'];
             $pay_bills = \DB::table("pay_bills")->where('pay_order_number',$out_trade_no);
@@ -71,12 +73,16 @@ class PayController extends BaseController
                     $update = [
                         'pay_date' => Carbon::now(),
                         'pay_status' => 1,
-                        'parent_id' => $parent_id
+                        'parent_id' => $parent_id,
+                        'transaction_id' => $message['transaction_id'],
+                        'total_fee' => $message['total_fee']
                     ];
                     $res = $pay_bills->update($update);
                     if ($res){
                         // $parent_id = $pay_bills->first()->parent_id;
                         $client_id = $pay_bills->first()->client_id;
+                        // 发送模板消息
+                        $this->sendTempMsg($client_id, $order, $pay_bills->first());
                         Log::info("更新payBill成功,pid:".$parent_id."cid:".$client_id);
                         $this->client->updateTreeNode($client_id,$parent_id);
                     }
@@ -545,4 +551,30 @@ class PayController extends BaseController
         }
     }
 
+    public function sendTempMsg($client_id, $order, $pay_bills)
+    {
+        $oepn_id = Client::find($client_id)->open_id;
+        $minapp = app('wechat.mini_program');
+        $sendData = [
+            'touser' => $oepn_id,
+            'template_id' => 'IylQgK3QkoX2Jn5VrDGcrTC-jprXO6wRNpci9alVfls',
+            'page' => 'index',
+            'form_id' => $pay_bills->prepay_id,
+            'data' => [
+                'keyword1' => $pay_bills->transaction_id,
+                'keyword2' => $pay_bills->total_fee,
+                'keyword3' => $order->created_at,
+                'keyword4' => $pay_bills->name,
+                'keyword5' => $pay_bills->uid,
+                'keyword6' => $pay_bills->pay_date,
+                'keyword7' => $pay_bills->total_price,
+                'keyword8' => '已受理',
+                'keyword9' => $order->order_number,
+                'keyword10' => $pay_bills->name,
+            ],
+        ];
+        Log::info('===发送模板信息===sendData', $sendData);
+        $res = $minapp->template_message->send($sendData);
+        Log::info('===发送模板信息===resData' . json_encode($res));
+    }
 }

@@ -23,7 +23,7 @@ class PayRepository implements PayRepositoryInterface
         $a = new Application(config('wechat.payment'));
         $app = app('wechat.payment');
         //构造微信支付数组
-        $payBill['body'] = '小萌商城';
+        $payBill['body'] = $pay['name'];
         $payBill['out_trade_no'] = $pay['pay_order_number'];
         if (env('APP_DEBUG')) {
             $payBill['total_fee'] = 1;
@@ -36,6 +36,7 @@ class PayRepository implements PayRepositoryInterface
         $payBill['openid'] = $open_id;
         $result = $app->order->unify($payBill);
         $prepay_id =  $result['prepay_id'];
+        \DB::table('pay_bills')->where('pay_order_number', $pay['pay_order_number'])->update(['prepay_id' => $prepay_id]);
         $wxpayJssdkConfig = $app->jssdk->sdkConfig($prepay_id);
         return $wxpayJssdkConfig;
     }
@@ -47,7 +48,10 @@ class PayRepository implements PayRepositoryInterface
         foreach ($orders as $order){
             $total_price += $order->total_price;
         }
+        $order_line = OrderDetail::select('goods.name')->where('header_id', $order_header_id)
+            ->leftJoin('goods', 'goods.uid', '=', 'order_lines.good_id')->first();
         if ($orders->count()){
+            $pay['name'] = $order_line->name;
             $pay['client_id'] = $client->id;
             $pay['parent_id'] = $parent_id;
             $pay['order_header_id'] = $order_header_id;
