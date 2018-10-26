@@ -4,12 +4,14 @@ namespace App\Api\Controllers\Client;
 
 use App\Api\Controllers\BaseController;
 use App\Model\Client;
+use App\Model\Comment;
 use App\Model\Delivery;
 use App\Model\Good;
 use App\Model\Order;
 use App\Repositories\Client\ClientRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Mockery\Exception;
 
 
 class ClientController extends BaseController
@@ -265,5 +267,29 @@ class ClientController extends BaseController
             $amount->weekCome = intval($count->count);
         }
         return response_format($amount);
+    }
+
+    /**
+     * @api {get} /api/client/comment 用户留言
+     * @apiName leaveComment 用户留言
+     * @apiGroup Client
+     *
+     * @apiHeader (Authorization) {String} authorization header头需要添加bearer 示例{BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEzLCJpc3MiOiJodHRwczovL2RqLm1xcGhwLmNvbS9hcGkvdXNlci9sb2dpbiIsImlhdCI6MTUzNDI0ODMyMywiZXhwIjoxNTM2ODQwMzIzLCJuYmYiOjE1MzQyNDgzMjMsImp0aSI6Ik1hNjRKTTVFZDBlRTIyTXQifQ.NMNn4BUCVV6xg3s5oIvDAjuwVSdDCxRBLXidoMJAzqw}
+     *
+     */
+
+    public function levaeComment(Request $request)
+    {
+        try {
+            $comment = $request->comment;
+            $comment['client_id'] = $this->client->getUserByOpenId()->id;
+            $comment['comment'] = $comment;
+            $res = Comment::create($comment);
+            if ($res) {
+                return response_format($res);
+            }
+        } catch (Exception $e) {
+            return response_format([], 0, $e->getMessage());
+        }
     }
 }

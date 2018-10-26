@@ -1,10 +1,10 @@
 {
-  "name": "小萌商城API",
+  "name": "她芬小程序",
   "version": "0.0.1",
-  "description": "小萌商城API",
+  "description": "她芬小程序Api",
   "title": "Custom apiDoc browser title",
-  "url" : "https://dj.mqphp.com/api",
-  "sampleUrl": "https://dj.mqphp.com/api",
+  "url": "https://www.tophena1982.com/api",
+  "sampleUrl": "https://www.tophena1982.com/api",
   "template": {
     "withCompare": true,
     "withGenerator": true
