@@ -101,6 +101,8 @@ $api->version('v1', function ($api) {
             $api->get('cat_goods', 'Goods\GoodController@categoryGoodsList');
             //获取二维码
             $api->get('getQrcode', 'Client\ClientController@getQrcode');
+            //用户留言
+            $api->post('client/comment', 'Client\ClientController@levaeComment');
 
 
         });

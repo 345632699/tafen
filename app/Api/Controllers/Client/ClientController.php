@@ -284,8 +284,8 @@ class ClientController extends BaseController
     {
         try {
             $comment = $request->comment;
-            $comment['client_id'] = $this->client->getUserByOpenId()->id;
-            $comment['comment'] = $comment;
+            $commentData['client_id'] = $this->client->getUserByOpenId()->id;
+            $commentData['comment'] = $comment;
             $res = Comment::create($comment);
             if ($res) {
                 return response_format($res);
