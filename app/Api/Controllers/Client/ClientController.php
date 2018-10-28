@@ -229,7 +229,7 @@ class ClientController extends BaseController
         $path = 'qrcode/client_' . $clientId . '.png';
         if (!file_exists(public_path($path))) {
             $app = app('wechat.mini_program');
-            $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
+            $response = $app->app_code->get('pages/main/main?parent_id=' . $clientId);
             if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
                 $filename = $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
                 return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/qrcode/' . $filename]);
