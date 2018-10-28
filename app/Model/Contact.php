@@ -19,7 +19,8 @@ class Contact extends Model
         'area',
         'address',
         'update_time',
-        'default_flag'
+        'default_flag',
+        'postal_code'
     ];
 
     protected $primaryKey = 'uid';
