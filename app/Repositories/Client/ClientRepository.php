@@ -81,6 +81,7 @@ class ClientRepository implements ClientRepositoryInterface
                         $insert[$key]['created_at'] = Carbon::now();
                         $insert[$key]['updated_at'] = Carbon::now();
                     }
+                    \Log::info('==============添加用户树形结构j记录'.json_encode($insert,JSON_UNESCAPED_UNICODE).'==========');
                     \DB::table('client_link_treepaths')->insert($insert);
                     //插入自身的一条记录
                     $this->insertSelfNode($client_id);
@@ -110,6 +111,7 @@ class ClientRepository implements ClientRepositoryInterface
         $node['created_at'] = Carbon::now();
         $node['updated_at'] = Carbon::now();
         \DB::table('client_link_treepaths')->insert($node);
+        \Log::info('==============添加用户树形结构'.json_encode($node,JSON_UNESCAPED_UNICODE).'==========');
     }
 
 

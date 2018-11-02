@@ -4,12 +4,18 @@ namespace App\Http\Controllers\Client;
 
 use App\Client;
 use App\Model\ClientAmount;
+use App\Repositories\Client\ClientRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ClientController extends Controller
 {
-    public function getList() {
+  public function __construct(ClientRepository $client)
+  {
+    $this->client = $client;
+  }
+
+  public function getList() {
         $clients = Client::select('clients.*','client_amount.amount','client_amount.freezing_amount','client_amount.count_all as sum_money')
             ->leftJoin('client_amount','client_amount.client_id','=','clients.id')
             ->get();
@@ -25,11 +31,18 @@ class ClientController extends Controller
         $updateAmount['freezing_amount'] = $request->freezing_amount * 100;
         $res = $client->update($update);
         $res1 = ClientAmount::where('client_id',$request->id)->update($updateAmount);
+        if ($request->agent_type_id > 0){
+          $count = \DB::table('client_link_treepaths')->where('path_end_client_id')->count();
+          if (!$count){
+            $this->client->insertSelfNode($request->id);
+            \Log::info('============为用户:' .$request->id. '添加树结构记录=======');
+          }
+        }
         if ($res && $res1){
           return $this->resJson($client->first());
         }
       }else{
-        return $this->resJson([],0,'更新失败，用户不存咋');
+        return $this->resJson([],0,'更新失败，用户不存在');
       }
     }
 
