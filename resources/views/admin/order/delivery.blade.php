@@ -17,8 +17,8 @@
                                 <input type="text" name="delivery_number" class="form-control col-md-8">
                             </div>
                             <div class="col-md-12">
-                                <label for="name" class="control-label col-md-3">机器人序列号：</label>
-                                <textarea rows="3" placeholder="请用,号隔开" name="product_ids" class="form-control col-md-8"></textarea>
+                                <label for="name" class="control-label col-md-3">快递费用：</label>
+                                <input type="number" placeholder="" value="0" name="shipping_fee" class="form-control col-md-8"></input>
                             </div>
                             <input type="hidden" name="order_id" value="{{ $order_id }}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">

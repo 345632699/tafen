@@ -110,6 +110,7 @@ class OrderController extends Controller
         $update['shipping_code'] = $delivery_number;
         $update['shipping_time'] = Carbon::now();
         $update['shipping_name'] = $delivery_name;
+        $update['shipping_fee'] = $request->get('shipping_fee',0) ;
         $update['shipping_status'] = 1;
         Order::where('uid', $order_id)->update($update);
 
