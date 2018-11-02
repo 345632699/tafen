@@ -81,16 +81,7 @@ class ClientController extends BaseController
         $agent_good_list = Good::where('agent_type_id', '>', 0)->get();
         $client->default_address_id = $address_id;
         $client->agent_good_list = $agent_good_list;
-        $path = 'qrcode/client_' . $client_id . '.png';
-        if (!file_exists(public_path($path))) {
-            $clientId = $this->client->getUserByOpenId()->id;
-            $app = app('wechat.mini_program');
-            $response = $app->app_code->get('page/main/main?parent_id=' . $clientId);
-            if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
-                $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
-            }
-        }
-        $client->share_photo = 'http://' . $_SERVER['HTTP_HOST'] . '/qrcode/client_' . $client_id . '.png';
+        $client->share_photo = 'http://' . $_SERVER['HTTP_HOST'] . '/qrcode/' . $client_id . '.png';
 
         //待支付
         $wait_pay = Order::where(['client_id' => $client_id, 'order_status' => 0])->count();
@@ -226,12 +217,12 @@ class ClientController extends BaseController
     public function getQrcode()
     {
         $clientId = $this->client->getUserByOpenId()->id;
-        $path = 'qrcode/client_' . $clientId . '.png';
+        $path = 'qrcode/' . $clientId . '.png';
         if (!file_exists(public_path($path))) {
             $app = app('wechat.mini_program');
             $response = $app->app_code->get('pages/main/main?parent_id=' . $clientId);
             if ($response instanceof \EasyWeChat\Kernel\Http\StreamResponse) {
-                $filename = $response->saveAs(public_path('qrcode'), 'client_' . $clientId . '.png');
+                $filename = $response->saveAs(public_path('qrcode'), $clientId . '.png');
                 return response_format(['qrcode_url' => $_SERVER["HTTP_HOST"] . '/qrcode/' . $filename]);
             }
         } else {

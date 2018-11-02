@@ -367,6 +367,9 @@ class PayController extends BaseController
                             $c_rake_back_rate = \DB::table('agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
                         }
                         $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
+                        if ($p_agent_type == 1 && $c_agent_type == 1) {
+                            $rate = 0.1;
+                        }
                     }
 
                     if ($rate > 0) {
