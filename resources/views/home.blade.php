@@ -18,6 +18,8 @@
                         <a href="/#/client/list">查看所有用户</a>
                         <br>
                         <a href="/#/banner/list">查看广告banner</a>
+                        <br>
+                        <a href="/#/order/return-list">查看退货列表</a>
                     </div>
                 </div>
             </div>

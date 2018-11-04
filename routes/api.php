@@ -27,6 +27,10 @@ Route::group(['middleware' => ['auth:api']], function () {
 });
 Route::get('/good/getAttr', 'Good\GoodController@goodAttr');
 Route::post('/good/create', 'Good\GoodController@create');
+Route::get('/withdraw/list', 'Client\ClientController@withDrawList');
+Route::post('/withdraw/operate', 'Client\ClientController@withdrawOperate');
+Route::get('/return/list', 'Client\ClientController@returnList');
+Route::post('/return/operate', 'Client\ClientController@confirmReturn');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {

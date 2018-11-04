@@ -6,41 +6,52 @@ import BnnerUpload from '../components/Banner/Upload.vue'
 import ClientList from '../components/Client/List.vue'
 import BannerList from '../components/Banner/List.vue'
 import Hello from '../components/Hello.vue'
+import WithDrawList from '../components/WithDraw/RecordList.vue'
+import ReturnList from '../components/Order/ReturnList.vue'
 
 Vue.use(VueRouter);
 
 export default new VueRouter({
-  saveScrollPosition: true,
-  routes: [
-    {
-      name: 'hello',
-      path: '/hello',
-      component: Hello
-    },
-    {
-      name: 'create',
-      path: '/good/create',
-      component: GoodCreate
-    },
-    {
-      name: 'lesson-create',
-      path: '/lesson/create',
-      component: LessonCreate
-    },
-    {
-      name: 'client-list',
-      path: '/client/list',
-      component: ClientList
-    },
-    {
-      name: 'banner-list',
-      path: '/banner/list',
-      component: BannerList
-    },
-    {
-      name: 'banner-upload',
-      path: '/banner/upload',
-      component: BnnerUpload
-    }
-  ]
+	saveScrollPosition: true,
+	routes: [
+		{
+			name: 'hello',
+			path: '/hello',
+			component: Hello
+		},
+		{
+			name: 'create',
+			path: '/good/create',
+			component: GoodCreate
+		},
+		{
+			name: 'lesson-create',
+			path: '/lesson/create',
+			component: LessonCreate
+		},
+		{
+			name: 'client-list',
+			path: '/client/list',
+			component: ClientList
+		},
+		{
+			name: 'banner-list',
+			path: '/banner/list',
+			component: BannerList
+		},
+		{
+			name: 'banner-upload',
+			path: '/banner/upload',
+			component: BnnerUpload
+		},
+		{
+			name: 'withdraw-list',
+			path: '/withdraw/list',
+			component: WithDrawList
+		},{
+			name: 'return-list',
+			path: '/order/return-list',
+			component: ReturnList
+		}
+	]
 });
