@@ -88,7 +88,7 @@ class PayController extends BaseController
                     }
 
                     // 判断商品 是否代理商品
-                    $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
+                    $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.total_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
                     Log::info("=========================更新等级==============");
@@ -304,6 +304,7 @@ class PayController extends BaseController
             $good_id = $order_lines[0]->good_id;
             $last_price = $order_lines[0]->last_price;
             $good_agent_type = Good::find($good_id)->agent_type_id;
+            Log::info('$order_lines:' . $order_lines[0]->total_price);
             switch ($good_agent_type) {
                 case 1:
                     if ($parent->agent_type_id == 1) {
