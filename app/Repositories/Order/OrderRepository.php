@@ -23,7 +23,7 @@ use Mockery\Exception;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    
+
     public function __construct(ClientRepository $client)
     {
         $this->client = $client;
@@ -72,6 +72,9 @@ class OrderRepository implements OrderRepositoryInterface
             $order_line_data['last_price'] =  $order_line_data['discount_price'];
         }else{
             $order_line_data['last_price'] =  $order_line_data['agent_price'];
+        }
+        if ($good->agent_type_id > 0) {
+            $order_line_data['last_price'] = $order_line_data['original_price'];
         }
         $order_line_data['total_price'] = $order_line_data['last_price'] * $order_line_data['quantity'];
         $contract = Contact::find($request->get('address_id'));
