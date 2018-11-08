@@ -314,14 +314,14 @@ class PayController extends BaseController
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 17600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 6000;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 17600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     }
                     break;
@@ -339,20 +339,20 @@ class PayController extends BaseController
                             }
                         }
                         // 更新业绩
-                        $amount = 76600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 16000;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 76600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     }
                     break;
                 case 3:
                     // 更新业绩
-                    $amount = 300000;
+                    $amount = $order_lines[0]->total_price;
                     $this->updateAchievement($parent, $amount);
                     break;
                 default:
