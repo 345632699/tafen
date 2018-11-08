@@ -89,8 +89,15 @@ class OrderRepository implements OrderRepositoryInterface
         $order_line_data['buyer_msg'] = '';
         $order_line_data['quantity'] = $cart->number;
         $order_line_data['attr_good_mapping_id'] = $cart->attr_good_mapping_id;
-        $order_line_data['original_price'] = $cart->original_price;
-        $order_line_data['discount_price'] = $cart->discount_price;
+        $attr_good_mapping_id = $cart->attr_good_mapping_id;
+        if ($attr_good_mapping_id) {
+            $attr_mapping = DB::table('attr_good_mapping')->where('id', $attr_good_mapping_id)->first();
+            $order_line_data['original_price'] = $attr_mapping->original_price;
+            $order_line_data['discount_price'] = $attr_mapping->discount_price;
+        } else {
+            $order_line_data['original_price'] = $cart->original_price;
+            $order_line_data['discount_price'] = $cart->discount_price;
+        }
         $order_line_data['agent_price'] = $cart->agent_price;
         $order_line_data['last_price'] =  $cart->last_price;
         $order_line_data['total_price'] = $cart->total_price;
