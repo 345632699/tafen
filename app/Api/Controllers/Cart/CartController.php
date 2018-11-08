@@ -9,6 +9,7 @@ use App\Model\Cart;
 use App\Model\Good;
 use App\Repositories\Client\ClientRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
 
 class CartController extends BaseController
