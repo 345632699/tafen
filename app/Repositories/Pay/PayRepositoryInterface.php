@@ -35,4 +35,12 @@ interface PayRepositoryInterface {
      * @return mixed
      */
     public function withDraw($withdraw_id,$client,$amount);
+
+    /**
+     * @param $refund_id
+     * @return mixed
+     * 微信退款 根据商户订单号退款
+     */
+    public function refund($refund_id);
+
 }

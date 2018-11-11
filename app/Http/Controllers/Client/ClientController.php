@@ -8,14 +8,16 @@ use App\Model\Order;
 use App\Model\ReturnOrder;
 use App\Model\WithdrawRecord;
 use App\Repositories\Client\ClientRepository;
+use App\Repositories\Pay\PayRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ClientController extends Controller
 {
-  public function __construct(ClientRepository $client)
+    public function __construct(ClientRepository $client, PayRepository $pay)
   {
     $this->client = $client;
+      $this->pay = $pay;
   }
 
   public function getList()
@@ -119,5 +121,10 @@ class ClientController extends Controller
     }
     return resJson([]);
   }
+
+    public function refund()
+    {
+        $this->pay->refund(6);
+    }
 
 }

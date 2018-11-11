@@ -31,6 +31,7 @@ Route::get('/withdraw/list', 'Client\ClientController@withDrawList');
 Route::post('/withdraw/operate', 'Client\ClientController@withdrawOperate');
 Route::get('/return/list', 'Client\ClientController@returnList');
 Route::post('/return/operate', 'Client\ClientController@confirmReturn');
+Route::get('/refund', 'Client\ClientController@refund');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
