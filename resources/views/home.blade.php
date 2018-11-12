@@ -22,6 +22,8 @@
                         <a href="/#/order/return-list">查看退货列表</a>
                         <br>
                         <a href="/#/withdraw/list">查看提现列表</a>
+                        <br>
+                        <a href="/#/spread/list">查看佣金列表</a>
                     </div>
                 </div>
             </div>
