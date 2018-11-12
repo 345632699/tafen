@@ -9,6 +9,7 @@ import Hello from '../components/Hello.vue'
 import WithDrawList from '../components/WithDraw/RecordList.vue'
 import SpreadList from '../components/Spread/List.vue'
 import ReturnList from '../components/Order/ReturnList.vue'
+import GoodList from '../components/Good/List.vue'
 
 Vue.use(VueRouter);
 
@@ -59,6 +60,11 @@ export default new VueRouter({
       name: 'spread-list',
       path: '/spread/spread-list',
       component: SpreadList
+    },
+    {
+      name: 'good-list',
+      path: '/good/good-list',
+      component: GoodList
     }
 	]
 });

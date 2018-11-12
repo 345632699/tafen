@@ -1,60 +1,87 @@
 <template>
   <div class="client-list">
-    <h1>用户列表</h1>
+    <h1>商品列表</h1>
+    <el-button @click.native="addGood">添加商品</el-button>
     <el-table
-        :data="spread_list"
+        :data="good_list"
         style="width: 100%">
 
       <el-table-column
-          label="姓名"
+          label="商品名称"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.nick_name }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column
-          label="审核记录"
+          label="商品名称"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.memo }}</span>
+          <img :src="scope.row.thumbnail_img" alt="" width="100" height="80">
         </template>
       </el-table-column>
       <el-table-column
-          label="金额"
+          label="商品描述"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.amount / 100 }}（元）</span>
+          <span>{{ scope.row.description }}</span>
         </template>
       </el-table-column>
       <el-table-column
-          label="审核状态"
+          label="是否优惠"
       >
         <template slot-scope="scope">
-          <span v-if="scope.row.type == 2">待审核</span>
-          <span v-else-if="scope.row.type == 3">已入账</span>
-          <span v-else-if="scope.row.type == 0">审核未通过</span>
+          <span v-if="scope.row.is_coupon == 1">是</span>
+          <span v-else-if="scope.row.is_coupon == 0">否</span>
         </template>
       </el-table-column>
       <el-table-column
-          label="提现时间"
+          label="商品原价"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.original_price / 100 }}（元）</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+          label="商品优惠价"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.discount_price / 100 }}（元）</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+          label="运费"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.delivery_fee / 100 }}（元）</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+          label="上架时间"
           width="200">
         <template slot-scope="scope">
           <i class="el-icon-time"></i>
           <span style="margin-left: 10px">{{ scope.row.created_at }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column
+          label="是否上架"
+      >
+        <template slot-scope="scope">
+          <span v-if="scope.row.is_onsale == 1">是</span>
+          <span v-else-if="scope.row.is_onsale == 0">否</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button
-              v-if="scope.row.type == 2"
               size="mini"
-              @click="handleConfirm(scope.$index, scope.row)">确定
+              @click="handleConfirm(scope.$index, scope.row)">编辑
           </el-button>
           <el-button
-              v-if="scope.row.type == 2"
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">拒绝
+              @click="handleDelete(scope.$index, scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -69,7 +96,7 @@
     name: "list",
     data() {
       return {
-        spread_list: [],
+        good_list: [],
         selected: 0,
         page: 1,
         last_page: 1,
@@ -105,6 +132,9 @@
       }
     },
     methods: {
+      addGood () {
+        this.$router.push({path: '/good/create'})
+      },
       handleEdit(index, row) {
         console.log(index, row)
         this.form.agent_type_id = row.agent_type_id
@@ -122,9 +152,9 @@
           client_id: row.client_id,
           amount: row.amount
         }
-        axios.post('/api/spread/update', query).then(function (response) {
+        axios.post('/api/good/update', query).then(function (response) {
           if (response.data.status) {
-            that.getSpreadList()
+            that.getGoodList()
             that.$notify({
               title: '成功',
               message: response.data.msg,
@@ -152,9 +182,9 @@
           client_id: row.client_id,
           amount: row.amount
         }
-        axios.post('/api/spread/update', query).then(function (response) {
+        axios.post('/api/good/update', query).then(function (response) {
           if (response.data.status) {
-            that.getSpreadList()
+            that.getGoodList()
             that.$notify({
               title: '成功',
               message: response.data.msg,
@@ -174,10 +204,10 @@
           });
         })
       },
-      getSpreadList(page = 1) {
+      getGoodList(page = 1) {
         let that = this
-        axios.get('/api/spread/list?page=' + page).then(function (response) {
-          that.spread_list = response.data.data.data
+        axios.get('/api/good/list?page=' + page).then(function (response) {
+          that.good_list = response.data.data.data
           this.last_page = response.data.data.last_page
         }).catch((err) => {
           let res = err.response.data
@@ -193,7 +223,7 @@
         if (page <= 0) {
           page = 1
         }
-        this.getSpreadList(page)
+        this.getGoodList(page)
         this.page = page
       },
       nextPage () {
@@ -205,7 +235,7 @@
           });
           return
         }
-        this.getSpreadList(page)
+        this.getGoodList(page)
         this.page = page
       }
     },
@@ -213,7 +243,7 @@
 
     },
     created() {
-      this.getSpreadList()
+      this.getGoodList()
     }
   }
 </script>

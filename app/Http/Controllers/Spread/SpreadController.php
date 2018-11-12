@@ -9,7 +9,7 @@ class SpreadController extends Controller
 {
     public function getList(Request $request)
     {
-        $limit = $request->get('limit', 100);
+        $limit = $request->get('limit', 20);
         $flow_list = \DB::table('client_amount_flow')
             ->select('clients.nick_name', 'client_amount_flow.*')
             ->leftJoin('clients', 'clients.id', '=', 'client_amount_flow.client_id')

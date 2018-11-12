@@ -34,6 +34,7 @@ Route::post('/return/operate', 'Client\ClientController@confirmReturn');
 //Route::get('/refund', 'Client\ClientController@refund');
 Route::get('/spread/list', 'Spread\SpreadController@getList');
 Route::post('/spread/update', 'Spread\SpreadController@updateRecord');
+Route::get('/good/list', 'Good\GoodController@goodList');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
