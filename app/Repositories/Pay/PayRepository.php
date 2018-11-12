@@ -114,6 +114,9 @@ class PayRepository implements PayRepositoryInterface
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => $refund->return_reason,
         ]);
-        dd($result);
+        if ($result['err_code'] == 'FAIL') {
+            return resJson([], 0, $result['err_code_des']);
+        }
+        return resJson([], 1, '退款成功');
     }
 }

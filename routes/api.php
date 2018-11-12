@@ -31,7 +31,9 @@ Route::get('/withdraw/list', 'Client\ClientController@withDrawList');
 Route::post('/withdraw/operate', 'Client\ClientController@withdrawOperate');
 Route::get('/return/list', 'Client\ClientController@returnList');
 Route::post('/return/operate', 'Client\ClientController@confirmReturn');
-Route::get('/refund', 'Client\ClientController@refund');
+//Route::get('/refund', 'Client\ClientController@refund');
+Route::get('/spread/list', 'Spread\SpreadController@getList');
+Route::post('/spread/update', 'Spread\SpreadController@updateRecord');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
@@ -108,10 +110,6 @@ $api->version('v1', function ($api) {
             $api->get('getQrcode', 'Client\ClientController@getQrcode');
             //用户留言
             $api->post('client/comment', 'Client\ClientController@levaeComment');
-
-
         });
-
-
     });
 });

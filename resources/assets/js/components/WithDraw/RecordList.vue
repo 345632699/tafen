@@ -120,7 +120,7 @@
 				}
 				axios.post('/api/withdraw/operate', query).then(function (response) {
 					if (response.data.status) {
-						this.getWithdrawList()
+            that.getWithdrawList()
 						that.$notify({
 							title: '成功',
 							message: response.data.msg,
@@ -150,7 +150,7 @@
                 }
 				axios.post('/api/withdraw/operate', query).then(function (response) {
 					if (response.data.status) {
-						this.getWithdrawList()
+            that.getWithdrawList()
 						that.$notify({
 							title: '成功',
 							message: response.data.msg,
