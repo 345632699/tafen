@@ -105,6 +105,7 @@ class ClientController extends Controller
         if ($operation_type == 2) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 2]);
             Order::where('uid', $order_id)->update(['order_status' => 7]);
+            return resJson([]);
         } elseif ($operation_type == 4) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 4]);
             Order::where('uid', $order_id)->update(['order_status' => 8]);
@@ -112,6 +113,7 @@ class ClientController extends Controller
         } elseif ($operation_type == 0) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 0]);
             Order::where('uid', $order_id)->update(['order_status' => 6]);
+            return resJson([]);
         } else {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 1]);
             if (ReturnOrder::where('uid', $return_order_id)->first()->good_status == 1) {
@@ -120,6 +122,7 @@ class ClientController extends Controller
                 $order_status = 2;
             }
             Order::where('uid', $order_id)->update(['order_status' => $order_status]);
+            return resJson([], 1, '重置成功');
         }
         if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'FAIL') {
             return resJson([], 0, $result['err_code_des']);
