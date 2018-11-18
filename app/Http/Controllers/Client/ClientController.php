@@ -108,7 +108,7 @@ class ClientController extends Controller
         } elseif ($operation_type == 4) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 4]);
             Order::where('uid', $order_id)->update(['order_status' => 8]);
-            $this->pay->refund($return_order_id);
+            $res = $this->pay->refund($return_order_id);
         } elseif ($operation_type == 0) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 0]);
             Order::where('uid', $order_id)->update(['order_status' => 6]);
@@ -121,7 +121,10 @@ class ClientController extends Controller
             }
             Order::where('uid', $order_id)->update(['order_status' => $order_status]);
         }
-        return resJson([]);
+        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'FAIL') {
+            return resJson([], 0, $result['err_code_des']);
+        }
+        return resJson([], 1, '退款成功');
     }
 
     public function refund()
