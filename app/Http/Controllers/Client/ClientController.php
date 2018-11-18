@@ -108,7 +108,7 @@ class ClientController extends Controller
         } elseif ($operation_type == 4) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 4]);
             Order::where('uid', $order_id)->update(['order_status' => 8]);
-            $res = $this->pay->refund($return_order_id);
+            $result = $this->pay->refund($return_order_id);
         } elseif ($operation_type == 0) {
             ReturnOrder::where('uid', $return_order_id)->update(['return_order_status' => 0]);
             Order::where('uid', $order_id)->update(['order_status' => 6]);
