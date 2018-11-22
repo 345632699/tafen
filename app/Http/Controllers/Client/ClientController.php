@@ -36,8 +36,6 @@ class ClientController extends Controller
 
     public function update(Request $request)
     {
-        $this->updateChildNode(10, 11);
-
         $client = Client::where('id', $request->id);
         if ($client->get()) {
             $update['agent_type_id'] = $request->agent_type_id;
@@ -159,17 +157,26 @@ class ClientController extends Controller
             ]);
             if ($childs->count() < 2) {
                 \DB::table('client_link_treepaths')->where([
-                    'path_begin_client_id' => $parent_id,
-                    'path_end_client_id' => $parent_id
+                    'path_begin_client_id' => $row->path_begin_client_id,
+                    'path_end_client_id' => $row->path_begin_client_id
                 ])->update(['is_leaf' => 1]);
             }
-            \DB::table('client_link_treepaths')->where([
+            $c_node = \DB::table('client_link_treepaths')->select("path_end_client_id")->where([
+                'path_begin_client_id' => $client_id,
+            ])->where('dist', '>', 0)->pluck("path_end_client_id")->toArray();
+            array_push($c_node, $client_id);
+            $p_node = \DB::table('client_link_treepaths')->select("path_begin_client_id")->where([
                 'path_end_client_id' => $client_id,
-            ])->delete();
+            ])->where('dist', '>', 0)->pluck("path_begin_client_id")->toArray();
+            \DB::table('client_link_treepaths')->whereIn(
+                'path_end_client_id', $c_node
+            )->whereIn('path_begin_client_id', $p_node)->where('dist', '>', 0)->where('dist', '>', 0)->delete();
         }
+
         $my_childs = \DB::table('client_link_treepaths')->select('path_end_client_id')->where([
             'path_begin_client_id' => $client_id,
         ])->where('dist', '>', 0)->pluck('path_end_client_id')->toArray();
+
         $this->updateParent($client_id, $parent_id, count($my_childs));
         $this->updateChildNode($client_id, $parent_id);
 //        $this->updateChids($client_id,$my_childs);
@@ -179,16 +186,18 @@ class ClientController extends Controller
     {
         $res = \DB::table('client_link_treepaths')->where([
             'path_begin_client_id' => $client_id,
-        ])->where('dist', '>', 0)->get();
-        foreach ($res as $key => $ine) {
-            $insert[$key]['path_begin_client_id'] = $parent_id;
-            $insert[$key]['dist'] = $ine->dist + 1;
-            $insert[$key]['is_leaf'] = $ine->is_leaf;
-            $insert[$key]['path_end_client_id'] = $ine->path_end_client_id;
-            $insert[$key]['created_at'] = Carbon::now();
-            $insert[$key]['updated_at'] = Carbon::now();
+        ])->where('dist', '>', 0);
+        if ($res->count()) {
+            foreach ($res->get() as $key => $ine) {
+                $insert[$key]['path_begin_client_id'] = $parent_id;
+                $insert[$key]['dist'] = $ine->dist + 1;
+                $insert[$key]['is_leaf'] = $ine->is_leaf;
+                $insert[$key]['path_end_client_id'] = $ine->path_end_client_id;
+                $insert[$key]['created_at'] = Carbon::now();
+                $insert[$key]['updated_at'] = Carbon::now();
+            }
+            \DB::table('client_link_treepaths')->insert($insert);
         }
-        \DB::table('client_link_treepaths')->insert($insert);
     }
 
     //更新父级节点
