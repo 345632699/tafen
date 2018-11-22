@@ -44,6 +44,21 @@
         </template>
       </el-table-column>
       <el-table-column
+          label="推荐人"
+      >
+        <template slot-scope="scope">
+          <span v-if="scope.row.active == 0">{{ scope.row.parent_name }}</span>
+          <el-select v-model="form.parent_id" placeholder="请选择" v-if="scope.row.active">
+            <el-option
+                v-for="item in parent_list"
+                :key="item.id"
+                :label="item.nick_name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </template>
+      </el-table-column>
+      <el-table-column
           label="代理等级"
       >
         <template slot-scope="scope">
@@ -105,8 +120,11 @@
           sum_money: 0,
           amount: 0,
           freezing_amount: 0,
-          id: 0
+          id: 0,
+          parent_id: 0
         },
+        currentRow: 0,
+        parent_list: [],
         options: [
           {
             value: 0,
@@ -139,7 +157,10 @@
         this.form.freezing_amount = row.freezing_amount / 100
         this.form.sum_money = row.sum_money / 100
         this.form.id = row.id
+        this.form.parent_id = row.parent_id
+        this.client_list[this.currentRow].active = 0
         this.client_list[index].active = 1
+        this.currentRow = index
       },
       handleDelete(index, row) {
         console.log(index, row);
@@ -172,11 +193,13 @@
       getClientList() {
         let that = this
         axios.get('/api/clientList').then(function (response) {
-          let client_list = response.data.clients
+          console.log(response)
+          let client_list = response.data.data.clients
           client_list.forEach(function (item, index) {
             client_list[index].active = 0
           })
           that.client_list = client_list
+          that.parent_list = response.data.data.parent_list
         }).catch((err) => {
           let res = err.response.data
           if (res.message == "Unauthenticated.") {
