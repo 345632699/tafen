@@ -55,6 +55,12 @@ class WechatController extends Controller
                 'freezing_amount' => 0,
             ];
             \DB::table('client_amount')->insert($amount);
+        } else {
+            if ($client->parent_id == 0 && $parent_id > 0) {
+                Client::where('open_id', $openId)->update([
+                    'parent_id' => $parent_id
+                ]);
+            }
         }
         if (isset($client->id)){
             $token = JWTAuth::fromUser($client);
