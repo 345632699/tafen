@@ -88,7 +88,7 @@ class PayController extends BaseController
                     }
 
                     // 判断商品 是否代理商品
-                    $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
+                    $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.total_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
                     Log::info("=========================更新等级==============");
@@ -304,6 +304,7 @@ class PayController extends BaseController
             $good_id = $order_lines[0]->good_id;
             $last_price = $order_lines[0]->last_price;
             $good_agent_type = Good::find($good_id)->agent_type_id;
+            Log::info('$order_lines:' . $order_lines[0]->total_price);
             switch ($good_agent_type) {
                 case 1:
                     if ($parent->agent_type_id == 1) {
@@ -314,14 +315,14 @@ class PayController extends BaseController
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 17600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 6000;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 17600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     }
                     break;
@@ -339,20 +340,20 @@ class PayController extends BaseController
                             }
                         }
                         // 更新业绩
-                        $amount = 76600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
                         $spread_amount = 16000;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
-                        $amount = 76600;
+                        $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     }
                     break;
                 case 3:
                     // 更新业绩
-                    $amount = 300000;
+                    $amount = $order_lines[0]->total_price;
                     $this->updateAchievement($parent, $amount);
                     break;
                 default:
@@ -388,6 +389,9 @@ class PayController extends BaseController
                     $c_rake_back_rate = \DB::table('agent_type')->where('id', $c_agent_type)->first()->rake_back_rate;
                 }
                 $rate = ($p_rake_back_rate - $c_rake_back_rate) / 100;
+                if ($p_agent_type == 1 && $c_agent_type == 1) {
+                    $rate = 0.1;
+                }
             }
             if ($rate > 0) {
                 foreach ($order_lines as $order_line) {

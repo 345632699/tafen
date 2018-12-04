@@ -58,7 +58,7 @@ class BannerController extends Controller
         try {
             $banner = \DB::table('banner_images')->where('id', $request->id);
             $update['is_display'] = $request->get('is_display', 0);
-            $update['sort'] = $request->get('is_display', 0);
+            $update['sort'] = $request->get('sort', 1);
 
             $res = $banner->update($update);
             if ($res) {

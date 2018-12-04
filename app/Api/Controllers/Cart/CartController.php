@@ -9,6 +9,7 @@ use App\Model\Cart;
 use App\Model\Good;
 use App\Repositories\Client\ClientRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
 
 class CartController extends BaseController
@@ -74,10 +75,17 @@ class CartController extends BaseController
         $Cart['number'] = $request->get('number',1);
         $Cart['shipping_fee'] = $request->get('shipping_fee',0);
         $Cart['attr_good_mapping_id'] = $request->attr_good_mapping_id;
-        $Cart['attribute_name'] = \DB::table('attr_good_mapping')->where('id',$request->attr_good_mapping_id)->first()->name;
-        $Cart['original_price'] = $good->original_price;
-        $Cart['discount_price'] = $good->discount_price;
-        $Cart['agent_price'] = $good->original_price * $rate / 100;
+        $attr_good_mapping_id = $request->get('attr_good_mapping_id', '');
+        if ($attr_good_mapping_id) {
+            $attr_mapping = DB::table('attr_good_mapping')->where('id', $attr_good_mapping_id)->first();
+            $Cart['attribute_name'] = $attr_mapping->name;
+            $Cart['original_price'] = $attr_mapping->original_price;
+            $Cart['discount_price'] = $attr_mapping->discount_price;
+        } else {
+            $Cart['original_price'] = $good->original_price;
+            $Cart['discount_price'] = $good->discount_price;
+        }
+        $Cart['agent_price'] = $Cart['original_price'] * $rate / 100;
         $Cart['last_price'] = $good->is_coupon ? $Cart['discount_price'] : $Cart['agent_price'];
         $Cart['total_price'] = $Cart['last_price'] * $Cart['number'];
         $cart = Cart::where(['client_id'=>$client_id,'good_id'=>$request->good_id])->get()->first();

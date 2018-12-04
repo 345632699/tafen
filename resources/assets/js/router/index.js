@@ -7,7 +7,9 @@ import ClientList from '../components/Client/List.vue'
 import BannerList from '../components/Banner/List.vue'
 import Hello from '../components/Hello.vue'
 import WithDrawList from '../components/WithDraw/RecordList.vue'
+import SpreadList from '../components/Spread/List.vue'
 import ReturnList from '../components/Order/ReturnList.vue'
+import GoodList from '../components/Good/List.vue'
 
 Vue.use(VueRouter);
 
@@ -48,10 +50,21 @@ export default new VueRouter({
 			name: 'withdraw-list',
 			path: '/withdraw/list',
 			component: WithDrawList
-		},{
+    },
+    {
 			name: 'return-list',
 			path: '/order/return-list',
 			component: ReturnList
-		}
+    },
+    {
+      name: 'spread-list',
+      path: '/spread/spread-list',
+      component: SpreadList
+    },
+    {
+      name: 'good-list',
+      path: '/good/good-list',
+      component: GoodList
+    }
 	]
 });

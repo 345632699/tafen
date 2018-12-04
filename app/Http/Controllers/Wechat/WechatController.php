@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wechat;
 
 use App\Model\Client;
+use App\Repositories\Client\ClientRepository;
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,10 +12,20 @@ use JWTAuth;
 class WechatController extends Controller
 {
     use Helpers;
+
+    /**
+     * WechatController constructor.
+     */
+    public function __construct(ClientRepository $client)
+    {
+        $this->client = $client;
+    }
+
     public function mini(Request $request){
         $code = $request->code;
         $iv = $request->iv;
         $encryptedData = $request->encryptedData;
+        $parent_id = $request->get('parent_id', 0);
         if (!isset($code)){
             return response('參數錯誤');
         }
@@ -33,8 +44,10 @@ class WechatController extends Controller
                 'avatar_url' => $decryptedData['avatarUrl'],
                 'open_id' => $decryptedData['openId'],
                 'gender' => $decryptedData['gender'],
+                'parent_id' => $parent_id,
             ];
             $client = Client::create($newUser);
+            $this->client->updateTreeNode($client->id, $parent_id);
             // 创建资金账户
             $amount = [
                 'client_id' => $client->id,
@@ -42,6 +55,12 @@ class WechatController extends Controller
                 'freezing_amount' => 0,
             ];
             \DB::table('client_amount')->insert($amount);
+        } else {
+            if ($client->parent_id == 0 && $parent_id > 0) {
+                Client::where('open_id', $openId)->update([
+                    'parent_id' => $parent_id
+                ]);
+            }
         }
         if (isset($client->id)){
             $token = JWTAuth::fromUser($client);

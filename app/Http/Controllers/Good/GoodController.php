@@ -37,4 +37,12 @@ class GoodController extends Controller
         }
 
     }
+
+    public function goodList(Request $request)
+    {
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 100);
+        $good_list = Good::paginate(10);
+        return resJson($good_list);
+    }
 }
