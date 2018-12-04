@@ -274,6 +274,7 @@ class GoodController extends BaseController
         $is_coupon = $request->get('is_coupon',0);
         //是否是优惠产品
         $where = [];
+        $where['is_onsale'] = 1;
         if ($cat_id) {
             $where['category_id'] = $cat_id;
         }
@@ -608,7 +609,7 @@ class GoodController extends BaseController
         $keyword = $request->keyword;
         $limit = $request->get('limit',10);
         $query = '%'.$keyword.'%';
-        $good_list = Good::where('name','like',$query)->paginate($limit);
+        $good_list = Good::where('name','like',$query)->where('is_onsale',1)->paginate($limit);
         $this->improveGoodList($good_list);
         return response_format($good_list);
     }

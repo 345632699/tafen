@@ -405,7 +405,7 @@ class CartController extends BaseController
     {
         $all = Good::all()->toArray();
         $rand = array_rand($all, 4);
-        $good_list = Good::whereIn('uid', $rand)->get();
+        $good_list = Good::whereIn('uid', $rand)->where("is_onsale",1)->get();
         foreach ($good_list as $good) {
             //代理价格
             $client_id = session('client.id');
