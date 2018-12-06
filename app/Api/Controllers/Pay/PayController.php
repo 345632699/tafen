@@ -91,6 +91,13 @@ class PayController extends BaseController
                     $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.total_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
+                    foreach ($order_lines as $line) {
+                        $good = Good::find($line->good_id);
+                        $good->update([
+                            "stock" => $good->stock - $order->quantity,
+                            "already_sold" => $good->already_sold + $order->quantity
+                        ]);
+                    }
                     Log::info("=========================更新等级==============");
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
