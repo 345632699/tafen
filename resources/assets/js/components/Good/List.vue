@@ -237,7 +237,7 @@
         let that = this
         axios.get('/api/good/list?page=' + page).then(function (response) {
           that.good_list = response.data.data.data
-          this.last_page = response.data.data.last_page
+					that.last_page = response.data.data.last_page
         }).catch((err) => {
           let res = err.response.data
           if (res.message == "Unauthenticated.") {
