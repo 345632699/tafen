@@ -10,7 +10,7 @@
       >
         <template slot-scope="scope">
           <span
-              style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{ scope.row.name
+              style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{ scope.row.good_name
             }}</span>
         </template>
       </el-table-column>
@@ -59,7 +59,7 @@
       >
         <template slot-scope="scope">
           <span
-              style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{ banner_List[0].name
+              style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{ scope.row.good_name
             }}</span>
         </template>
       </el-table-column>
@@ -99,19 +99,19 @@
       </el-table-column>
     </el-table>
     <!-- Form -->
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+    <el-dialog title="编辑图片" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="图片预览" :label-width="formLabelWidth">
           <img :src="form.url" alt="" style="width:80%"/>
         </el-form-item>
         <el-form-item label="图片地址" :label-width="formLabelWidth">
-          <el-input disabled v-model="form.url" autocomplete="off"></el-input>
+          <el-input disabled v-model="form.url" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="图片描述" :label-width="formLabelWidth">
-          <el-input v-model="form.description" autocomplete="off"></el-input>
+          <el-input v-model="form.description" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="图片排序" :label-width="formLabelWidth">
-          <el-input v-model="form.order_by" autocomplete="off"></el-input>
+          <el-input v-model="form.order_by" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="图片更换" :label-width="formLabelWidth">
           <el-upload
@@ -135,13 +135,11 @@
         <el-button type="primary" @click="handleConfirm">确 定</el-button>
       </div>
     </el-dialog>
-    {{ detail_img_list }}
   </div>
 </template>
 
 <script>
   export default {
-    name: "list",
     data() {
       return {
         banner_List: [],
@@ -209,41 +207,46 @@
         })
       },
       handleConfirm() {
-        this.dialogFormVisible = false
+        let that = this
+        that.dialogFormVisible = false
         let item = []
-        if (this.uploadData.good_type > 1) {
-          item = this.banner_list
+        if (that.uploadData.good_type == 2) {
+          item = that.detail_img_list[that.form.index]
         } else {
-          item = this.detail_img_list
+          console.log(that.form.index)
+          console.log(that.banner_List)
+          item = that.banner_List[that.form.index]
         }
         let query = {
           'good_id': item.good_id,
           'id': item.uid,
-          'description': item.description,
-          'order_by': item.order_by
+          'type': that.uploadData.good_type,
+          'description': that.form.description,
+          'url': that.form.url,
+          'order_by': that.form.order_by
         }
         console.log(query)
-//        axios.post('/api/good/imgUpdate', query).then(function (response) {
-//          if (response.data.status) {
-//            that.getGoodList()
-//            that.$notify({
-//              title: '成功',
-//              message: response.data.msg,
-//              type: 'success'
-//            })
-//          } else {
-//            that.$notify.error({
-//              title: '错误',
-//              message: response.data.msg
-//            });
-//          }
-//        }).catch((err) => {
-//          console.log(err)
-//          that.$notify.error({
-//            title: '错误',
-//            message: err
-//          });
-//        })
+        axios.post('/api/good/imgUpdate', query).then(function (response) {
+          if (response.data.status > 0) {
+            that.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success'
+            })
+            that.getGoodImgs()
+          } else {
+            that.$notify.error({
+              title: '错误',
+              message: response.data.msg
+            });
+          }
+        }).catch((err) => {
+          console.log(err)
+          that.$notify.error({
+            title: '错误',
+            message: err
+          });
+        })
       },
       getGoodImgs() {
         let good_id = this.$route.query.good_id

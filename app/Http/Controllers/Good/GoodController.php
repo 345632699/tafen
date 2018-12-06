@@ -56,7 +56,7 @@ class GoodController extends Controller
     public function bannerImgList(Request $request)
     {
         $good_banner_list = \DB::table("good_banners")
-            ->select('good_banners.*', 'goods.name')
+            ->select('good_banners.*', 'goods.name as good_name')
             ->leftJoin("goods", 'goods.uid', '=', 'good_banners.good_id')
             ->where("good_id", $request->good_id)->get();
         return resJson($good_banner_list);
@@ -64,7 +64,10 @@ class GoodController extends Controller
 
     public function detailImgList(Request $request)
     {
-        $detail_img_list = \DB::table("good_details")->where("good_id", $request->good_id)->get();
+        $detail_img_list = \DB::table("good_details")
+            ->select('good_details.*', 'goods.name as good_name')
+            ->leftJoin("goods", 'goods.uid', '=', 'good_details.good_id')
+            ->where("good_id", $request->good_id)->get();
         return resJson($detail_img_list);
     }
 
@@ -92,13 +95,26 @@ class GoodController extends Controller
 
     public function doUpdateImg(Request $request)
     {
-        $good_id = $request->good_id;
+        if ($request->good_type > 1) {
+            $tabel_name = "good_details";
+        } else {
+            $tabel_name = "good_banners";
+        }
+        $id = $request->id;
+        $update['url'] = $request->url;
+        $update['order_by'] = $request->order_by;
+        $update['description'] = $request->description;
+        $res = \DB::table($tabel_name)->where('uid', $id)->update($update);
 
+        if ($res) {
+            return resJson([], 1, '更新成功');
+        } else {
+            return resJson([], 0, '暂无更新');
+        }
     }
 
     public function update(Request $request)
     {
-        $good_id = $request->good_id;
 
     }
 

@@ -74,7 +74,7 @@ export default new VueRouter({
       component: DetailList
     },
     {
-      name: 'good-img',
+      name: 'good-banner',
       path: '/good/banners',
       component: GoodBannerList
     }
