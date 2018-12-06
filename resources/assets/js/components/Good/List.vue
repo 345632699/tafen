@@ -1,20 +1,24 @@
 <template>
   <div class="client-list">
     <h1>商品列表</h1>
-    <el-button @click.native="addGood">添加商品</el-button>
+    <el-button @click.native="addGood" type="primary">添加商品</el-button>
     <el-table
         :data="good_list"
         style="width: 100%">
 
       <el-table-column
           label="商品名称"
+          width="180"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <!--<span>{{ scope.row.name }}</span>-->
+          <span
+              style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;">{{ scope.row.name
+            }}</span>
         </template>
       </el-table-column>
       <el-table-column
-          label="商品名称"
+          label="缩略图"
       >
         <template slot-scope="scope">
           <img :src="scope.row.thumbnail_img" alt="" width="100" height="80">
@@ -22,13 +26,18 @@
       </el-table-column>
       <el-table-column
           label="商品描述"
+          width="180"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.description }}</span>
+            <span
+                style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;">{{ scope.row.description
+            }}</span>
+          <!--<span>{{ scope.row.description }}</span>-->
         </template>
       </el-table-column>
       <el-table-column
-          label="是否优惠"
+          label="优惠"
+          width="50"
       >
         <template slot-scope="scope">
           <span v-if="scope.row.is_coupon == 1">是</span>
@@ -43,7 +52,7 @@
         </template>
       </el-table-column>
       <el-table-column
-          label="商品优惠价"
+          label="优惠价"
       >
         <template slot-scope="scope">
           <span>{{ scope.row.discount_price / 100 }}（元）</span>
@@ -72,17 +81,40 @@
           <span v-else-if="scope.row.is_onsale == 0">否</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column
+          label="图片详情"
+      >
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="handleConfirm(scope.$index, scope.row)">编辑
+              type="primary"
+              @click="getDetail(scope.$index, scope.row)">查看
           </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column
+          label="规格"
+      >
+        <template slot-scope="scope">
           <el-button
               size="mini"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              type="info"
+              @click="">查看
           </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" >
+        <template slot-scope="scope">
+          <el-button
+              size="mini"
+              type="warning"
+              @click="handleEdit(scope.$index, scope.row)">编辑
+          </el-button>
+          <!--<el-button-->
+              <!--size="mini"-->
+              <!--type="danger"-->
+              <!--@click="handleDelete(scope.$index, scope.row)">删除-->
+          <!--</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -135,14 +167,11 @@
       addGood () {
         this.$router.push({path: '/good/create'})
       },
+			getDetail (index,row) {
+      	this.$router.push("/good/banners?good_id=" + row.uid)
+      },
       handleEdit(index, row) {
-        console.log(index, row)
-        this.form.agent_type_id = row.agent_type_id
-        this.form.amount = row.amount / 100
-        this.form.freezing_amount = row.freezing_amount / 100
-        this.form.sum_money = row.sum_money / 100
-        this.form.id = row.id
-        this.client_list[index].active = 1
+       this.$router.push('/good/edit?good_id=' + row.uid)
       },
       handleDelete(index, row) {
         let that = this

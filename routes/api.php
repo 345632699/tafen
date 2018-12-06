@@ -39,6 +39,10 @@ Route::get('/good/detailImgList', 'Good\GoodController@detailImgList');
 Route::get('/good/attributeList', 'Good\GoodController@attributeList');
 Route::get('/good/bannerImgList', 'Good\GoodController@bannerImgList');
 Route::post('/good/imgUpdate', 'Good\GoodController@doUpdateImg');
+Route::post('/good/deleteImg', 'Good\GoodController@deleteImg');
+Route::post('/good/addImg', 'Good\GoodController@addImg');
+Route::get('/good/edit', 'Good\GoodController@detail');
+Route::post('/good/update', 'Good\GoodController@update');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {

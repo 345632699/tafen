@@ -1,6 +1,6 @@
 <template>
   <div class="good container">
-    <h1>创建</h1>
+    <h1>商品编辑</h1>
     <div class="row">
       <div class="col-md-8 col-md-offset-2">
         <div class="panel panel-default">
@@ -17,8 +17,8 @@
               </el-form-item>
               <el-form-item label="是否优惠">
                 <el-select v-model="form.is_coupon" placeholder="请选择活动区域">
-                  <el-option label="是" value="1"></el-option>
-                  <el-option label="否" value="0"></el-option>
+                  <el-option v-for="item,index in option_list" :key="index" :label="item.name"
+                             :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="优惠价格">
@@ -35,26 +35,26 @@
               </el-form-item>
               <el-form-item label="是否上架">
                 <el-select v-model="form.is_onsale" placeholder="请选择">
-                  <el-option label="是" value="1"></el-option>
-                  <el-option label="否" value="0"></el-option>
+                  <el-option v-for="item,index in option_list" :key="index" :label="item.name"
+                             :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="是否新品">
                 <el-select v-model="form.is_new" placeholder="请选择">
-                  <el-option label="是" value="1"></el-option>
-                  <el-option label="否" value="0"></el-option>
+                  <el-option v-for="item,index in option_list" :key="index" :label="item.name"
+                             :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="是否热门">
                 <el-select v-model="form.is_hot" placeholder="请选择">
-                  <el-option label="是" value="1"></el-option>
-                  <el-option label="否" value="0"></el-option>
+                  <el-option v-for="item,index in option_list" :key="index" :label="item.name"
+                             :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="是否代理商品">
                 <el-select v-model="form.is_agent_type" placeholder="请选择">
-                  <el-option label="是" value="1"></el-option>
-                  <el-option label="否" value="0"></el-option>
+                  <el-option v-for="item,index in option_list" :key="index" :label="item.name"
+                             :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="关联代理等级">
@@ -76,8 +76,8 @@
                 <el-input type="number" v-model="form.sort"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSubmit">立即创建</el-button>
-                <el-button>取消</el-button>
+                <el-button type="primary" @click="onSubmit">保存修改</el-button>
+                <el-button @click.native="cancelEdit">取消</el-button>
               </el-form-item>
             </el-form>
 
@@ -107,18 +107,35 @@
           delivery_fee: '',
           sort: '',
           attribute_id: '',
-          is_coupon: 0
+          is_coupon: '',
+					update_time: '',
+					thumbnail_img: '',
+					updated_at: '',
+					uid: '',
+					already_sold: '',
+					banner_img: '',
+					combos_id: '',
         },
         attr_list: [],
         agent_type_list: [],
-        cat_list: []
+        cat_list: [],
+				option_list: [
+          {
+          	id: 1,
+            name: "是"
+          },
+          {
+						id: 0,
+						name: "否"
+          }
+        ]
       }
     },
     methods: {
       onSubmit() {
         console.log('submit!');
         let that = this
-        axios.post('/api/good/create', this.form).then(function (response) {
+        axios.post('/api/good/update', this.form).then(function (response) {
           if (response.data.status) {
             that.$notify({
               title: '成功',
@@ -138,8 +155,12 @@
             message: err
           });
         })
-      }
+      },
+			cancelEdit () {
+				this.$router.push('/good/good-list')
+			}
     },
+
     created () {
       let that = this
       axios.get('/api/good/getAttr').then(function (response) {
@@ -157,6 +178,21 @@
         }
         console.log(err.response.data);
       });
+      let good_id = this.$route.query.good_id
+			axios.get('/api/good/edit?good_id=' + good_id,).then(function (response) {
+				let res = response.data
+        console.log("res",res.data)
+				that.form = res.data
+				console.log("res",res.data)
+
+			}).catch((err) => {
+				let res = err.response.data
+				if (res.message == "Unauthenticated.") {
+					// this.$router.push({path:'/login'})
+					window.location.href = '/login'
+				}
+				console.log(err.response.data);
+			});
     }
   }
 </script>

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import GoodCreate from '../components/Good/Create.vue'
+import GoodIndex from '../components/Good/Index.vue'
 import LessonCreate from '../components/Lesson/Create.vue'
 import BnnerUpload from '../components/Banner/Upload.vue'
 import ClientList from '../components/Client/List.vue'
@@ -12,6 +13,7 @@ import ReturnList from '../components/Order/ReturnList.vue'
 import GoodList from '../components/Good/List.vue'
 import DetailList from '../components/Good/DetailList.vue'
 import GoodBannerList from '../components/Good/BannerList.vue'
+import GoodEdit from '../components/Good/Edit.vue'
 
 Vue.use(VueRouter);
 
@@ -27,6 +29,11 @@ export default new VueRouter({
 			name: 'create',
 			path: '/good/create',
 			component: GoodCreate
+		},
+		{
+			name: 'index',
+			path: '/good/index',
+			component: GoodIndex
 		},
 		{
 			name: 'lesson-create',
@@ -52,31 +59,36 @@ export default new VueRouter({
 			name: 'withdraw-list',
 			path: '/withdraw/list',
 			component: WithDrawList
-    },
-    {
+		},
+		{
 			name: 'return-list',
 			path: '/order/return-list',
 			component: ReturnList
-    },
-    {
-      name: 'spread-list',
-      path: '/spread/spread-list',
-      component: SpreadList
-    },
-    {
-      name: 'good-list',
-      path: '/good/good-list',
-      component: GoodList
-    },
-    {
-      name: 'good-img',
-      path: '/good/imgs',
-      component: DetailList
-    },
-    {
-      name: 'good-banner',
-      path: '/good/banners',
-      component: GoodBannerList
-    }
+		},
+		{
+			name: 'spread-list',
+			path: '/spread/spread-list',
+			component: SpreadList
+		},
+		{
+			name: 'good-list',
+			path: '/good/good-list',
+			component: GoodList
+		},
+		{
+			name: 'good-img',
+			path: '/good/imgs',
+			component: DetailList
+		},
+		{
+			name: 'good-edit',
+			path: '/good/edit',
+			component: GoodEdit
+		},
+		{
+			name: 'good-banner',
+			path: '/good/banners',
+			component: GoodBannerList
+		}
 	]
 });

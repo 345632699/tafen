@@ -51,6 +51,8 @@ class GoodController extends Controller
     public function detail(Request $request)
     {
         $good_id = $request->good_id;
+        $good = Good::find($good_id);
+        return resJson($good);
     }
 
     public function bannerImgList(Request $request)
@@ -58,7 +60,9 @@ class GoodController extends Controller
         $good_banner_list = \DB::table("good_banners")
             ->select('good_banners.*', 'goods.name as good_name')
             ->leftJoin("goods", 'goods.uid', '=', 'good_banners.good_id')
-            ->where("good_id", $request->good_id)->get();
+            ->where("good_id", $request->good_id)
+            ->orderBy('order_by')
+            ->get();
         return resJson($good_banner_list);
     }
 
@@ -67,6 +71,7 @@ class GoodController extends Controller
         $detail_img_list = \DB::table("good_details")
             ->select('good_details.*', 'goods.name as good_name')
             ->leftJoin("goods", 'goods.uid', '=', 'good_details.good_id')
+            ->orderBy('order_by')
             ->where("good_id", $request->good_id)->get();
         return resJson($detail_img_list);
     }
@@ -115,7 +120,43 @@ class GoodController extends Controller
 
     public function update(Request $request)
     {
+      $update = $this->array_remove($request->input(),'uid');
+      $res = Good::find($request->uid)->update($update);
+      if ($res) {
+        return resJson([], 1, '更新成功');
+      } else {
+        return resJson([], 0, '暂无更新');
+      }
+    }
 
+    public function deleteImg(Request $request){
+      $id = $request->id;
+      if ($request->good_type > 1) {
+        $tabel_name = "good_details";
+      } else {
+        $tabel_name = "good_banners";
+      }
+      $res = \DB::table($tabel_name)->where('uid', $id)->delete();
+      if ($res) {
+        return resJson([], 1, '删除成功');
+      } else {
+        return resJson([], 0, '删除失败');
+      }
+    }
+
+    public function addImg(Request $request){
+      if ($request->good_type > 1) {
+        $tabel_name = "good_details";
+      } else {
+        $tabel_name = "good_banners";
+      }
+      $input = $this->array_remove( $request->input(),"good_type");
+      $res = \DB::table($tabel_name)->insert($input);
+      if ($res) {
+        return resJson([], 1, '添加成功');
+      } else {
+        return resJson([], 0, '添加失败');
+      }
     }
 
     public function array_remove($arr, $key)

@@ -1,6 +1,7 @@
 <template>
   <div class="client-list">
     <h1>商品主图</h1>
+    <el-button @click.native="addMain(1)" type="primary">添加主图</el-button>
     <el-table
         :data="banner_List"
         style="width: 100%">
@@ -44,12 +45,13 @@
           <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              @click="handleDelete(scope.$index, scope.row, 1)">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
     <h1>商品详情图</h1>
+    <el-button @click.native="addMain(2)" type="primary">添加详情图</el-button>
     <el-table
         :data="detail_img_list"
         style="width: 100%">
@@ -93,7 +95,7 @@
           <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              @click="handleDelete(scope.$index, scope.row, 2)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -131,7 +133,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="cancelEdit">取 消</el-button>
         <el-button type="primary" @click="handleConfirm">确 定</el-button>
       </div>
     </el-dialog>
@@ -161,12 +163,21 @@
           description: '',
           index: ''
         },
+        is_create: false,
         formLabelWidth: '120px'
       }
     },
     methods: {
-      addGood () {
-        this.$router.push({path: '/good/create'})
+      addMain (type) {
+				this.form = {
+					url: '',
+					order_by: 1,
+					description: '',
+					index: ''
+				}
+        this.is_create = true
+        this.uploadData.good_type = type
+        this.dialogFormVisible = true
       },
       handleEdit(index, row, type) {
         this.uploadData.good_type = type
@@ -176,17 +187,15 @@
         this.form.order_by = row.order_by
         this.form.index = index
       },
-      handleDelete(index, row) {
+      handleDelete(index, row, type) {
         let that = this
         let query = {
           id: row.uid,
-          type: 2,
-          client_id: row.client_id,
-          amount: row.amount
+          good_type: type
         }
-        axios.post('/api/good/update', query).then(function (response) {
+        axios.post('/api/good/deleteImg', query).then(function (response) {
           if (response.data.status) {
-            that.getGoodList()
+            that.getGoodImgs()
             that.$notify({
               title: '成功',
               message: response.data.msg,
@@ -206,47 +215,106 @@
           });
         })
       },
+      cancelEdit (){
+				this.is_create = false
+				this.dialogFormVisible = false
+				this.form = {
+					url: '',
+					order_by: '',
+					description: '',
+					index: ''
+				}
+				this.fileList = []
+      },
+      addImg(){
+      	let that = this
+      	this.is_create = false
+				let good_id = this.$route.query.good_id
+				let query = {
+      		url: this.form.url,
+      		description: this.form.description,
+      		order_by: this.form.order_by,
+      		good_type: this.uploadData.good_type,
+          good_id: good_id
+        }
+				axios.post('/api/good/addImg', query).then(function (response) {
+					if (response.data.status > 0) {
+						that.$notify({
+							title: '成功',
+							message: response.data.msg,
+							type: 'success'
+						})
+						that.getGoodImgs()
+						that.form = {
+							url: '',
+							order_by: '',
+							description: '',
+							index: ''
+						}
+					} else {
+						that.$notify.error({
+							title: '错误1',
+							message: response.data.msg
+						});
+					}
+				}).catch((err) => {
+					console.log(err)
+					that.$notify.error({
+						title: '错误2',
+						message: err
+					});
+				})
+      },
       handleConfirm() {
-        let that = this
-        that.dialogFormVisible = false
-        let item = []
-        if (that.uploadData.good_type == 2) {
-          item = that.detail_img_list[that.form.index]
-        } else {
-          console.log(that.form.index)
-          console.log(that.banner_List)
-          item = that.banner_List[that.form.index]
+				let that = this
+				that.dialogFormVisible = false
+				this.fileList = []
+      	if (this.is_create){
+      		this.addImg()
+        }else{
+					let item = []
+					if (that.uploadData.good_type == 2) {
+						item = that.detail_img_list[that.form.index]
+					} else {
+						item = that.banner_List[that.form.index]
+					}
+					let query = {
+						'good_id': item.good_id,
+						'id': item.uid,
+						'type': that.uploadData.good_type,
+						'description': that.form.description,
+						'url': that.form.url,
+						'order_by': that.form.order_by
+					}
+					that.form = {
+						url: '',
+						order_by: '',
+						description: '',
+						index: ''
+					}
+					axios.post('/api/good/imgUpdate', query).then(function (response) {
+						if (response.data.status > 0) {
+							that.$notify({
+								title: '成功',
+								message: response.data.msg,
+								type: 'success'
+							})
+							that.getGoodImgs()
+						} else {
+							that.$notify.error({
+								title: '错误',
+								message: response.data.msg
+							});
+						}
+					}).catch((err) => {
+						console.log(err)
+						that.$notify.error({
+							title: '错误',
+							message: err
+						});
+					})
         }
-        let query = {
-          'good_id': item.good_id,
-          'id': item.uid,
-          'type': that.uploadData.good_type,
-          'description': that.form.description,
-          'url': that.form.url,
-          'order_by': that.form.order_by
-        }
-        console.log(query)
-        axios.post('/api/good/imgUpdate', query).then(function (response) {
-          if (response.data.status > 0) {
-            that.$notify({
-              title: '成功',
-              message: response.data.msg,
-              type: 'success'
-            })
-            that.getGoodImgs()
-          } else {
-            that.$notify.error({
-              title: '错误',
-              message: response.data.msg
-            });
-          }
-        }).catch((err) => {
-          console.log(err)
-          that.$notify.error({
-            title: '错误',
-            message: err
-          });
-        })
+
       },
       getGoodImgs() {
         let good_id = this.$route.query.good_id
@@ -298,7 +366,7 @@
 
 <style scoped>
   .client-list {
-    max-width: 1280px;
+    max-width: 980px;
     margin: auto;
   }
 </style>
