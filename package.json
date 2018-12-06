@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "apidoc": "^0.17.6",
-    "element-ui": "^2.4.6"
+    "element-ui": "^2.4.6",
+    "less": "^2.7.3",
+    "less-loader": "^4.1.0"
   }
 }
