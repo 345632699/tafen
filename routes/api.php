@@ -35,6 +35,10 @@ Route::post('/return/operate', 'Client\ClientController@confirmReturn');
 Route::get('/spread/list', 'Spread\SpreadController@getList');
 Route::post('/spread/update', 'Spread\SpreadController@updateRecord');
 Route::get('/good/list', 'Good\GoodController@goodList');
+Route::get('/good/detailImgList', 'Good\GoodController@detailImgList');
+Route::get('/good/attributeList', 'Good\GoodController@attributeList');
+Route::get('/good/bannerImgList', 'Good\GoodController@bannerImgList');
+Route::get('/good/imgUpdate', 'Good\GoodController@doUpdateImg');
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {

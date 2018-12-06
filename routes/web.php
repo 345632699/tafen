@@ -41,6 +41,7 @@ Route::get('spread_list', 'Employee\EmplyeeController@spreadList');
 Route::get('employee_list', 'Employee\EmplyeeController@all');
 
 Route::post('banner/upload', 'Banner\BannerController@upload');
+Route::post('good/upload', 'Good\GoodController@uploadImg');
 
 // 个人中心
 

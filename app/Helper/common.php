@@ -29,12 +29,11 @@ function upload($request, $file, $file_path = "/order_return/")
     $size = $file->getClientSize();
     $mbsize = $size / 1048576;
     $totaltsize = substr($mbsize, 0, 4);
-
     if ($totaltsize > 15) {
         echo \GuzzleHttp\json_encode('false');
     }
 
-    $input = ['path' => $file_path . $filename, 'size' => "$totaltsize", 'file_display' => "$originalName"];
+    $input = ['path' => "http://" . $_SERVER["HTTP_HOST"] . $file_path . $filename, 'size' => "$totaltsize", 'file_display' => "$originalName"];
 
     return $input;
 }

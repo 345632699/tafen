@@ -10,6 +10,8 @@ import WithDrawList from '../components/WithDraw/RecordList.vue'
 import SpreadList from '../components/Spread/List.vue'
 import ReturnList from '../components/Order/ReturnList.vue'
 import GoodList from '../components/Good/List.vue'
+import DetailList from '../components/Good/DetailList.vue'
+import GoodBannerList from '../components/Good/BannerList.vue'
 
 Vue.use(VueRouter);
 
@@ -65,6 +67,16 @@ export default new VueRouter({
       name: 'good-list',
       path: '/good/good-list',
       component: GoodList
+    },
+    {
+      name: 'good-img',
+      path: '/good/imgs',
+      component: DetailList
+    },
+    {
+      name: 'good-img',
+      path: '/good/banners',
+      component: GoodBannerList
     }
 	]
 });
