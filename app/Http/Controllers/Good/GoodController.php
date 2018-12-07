@@ -15,7 +15,7 @@ class GoodController extends Controller
 {
     public function goodAttr()
     {
-        $attributeList = Attribute::select('id', 'name')->get();
+        $attributeList = Attribute::select('id', 'name', 'description')->get();
         $catList = Category::select('id', 'name')->get();
         $agentList = \DB::table('agent_type')->get();
 
@@ -79,14 +79,52 @@ class GoodController extends Controller
     public function attributeList(Request $request)
     {
         $good_attr_list = \DB::table("attr_good_mapping")
-            ->select('attr_good_mapping.*', 'attributes.name as attr_name', 'attributes.description')
+            ->select('attr_good_mapping.*', 'attributes.name as attr_name', 'attributes.description', 'goods.name as good_name')
             ->leftJoin('attributes', 'attr_good_mapping.attr_id', '=', 'attributes.id')
+            ->leftJoin('goods', 'goods.uid', '=', 'attr_good_mapping.good_id')
             ->where("attr_good_mapping.good_id", $request->good_id)
             ->get();
-        $attr_list = Attribute::all();
+        $attr_list = Attribute::select('id', 'name', 'description')->get();
         $result['good_attr_list'] = $good_attr_list;
         $result['attr_list'] = $attr_list;
         return resJson($result);
+    }
+
+    public function attrUpdate(Request $request)
+    {
+        $update = $this->array_remove($request->input(), 'id');
+        $res = \DB::table('attr_good_mapping')
+            ->where('id', $request->id)
+            ->update($update);
+        if ($res) {
+            return resJson([], 1, '更新成功');
+        } else {
+            return resJson([], 0, '暂无更新');
+        }
+    }
+
+    public function addAttr(Request $request)
+    {
+        $insert = $request->input();
+        $insert['stock'] = 10000;
+        $res = \DB::table('attr_good_mapping')
+            ->insert($insert);
+        if ($res) {
+            return resJson([], 1, '创建成功');
+        } else {
+            return resJson([], 0, '创建失败');
+        }
+    }
+
+    public function delAttr(Request $request)
+    {
+        $res = \DB::table('attr_good_mapping')
+            ->where('id', $request->id)->delete();
+        if ($res) {
+            return resJson([], 1, '创建成功');
+        } else {
+            return resJson([], 0, '创建失败');
+        }
     }
 
     public function uploadImg(Request $request)

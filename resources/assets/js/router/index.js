@@ -14,6 +14,7 @@ import GoodList from '../components/Good/List.vue'
 import DetailList from '../components/Good/DetailList.vue'
 import GoodBannerList from '../components/Good/BannerList.vue'
 import GoodEdit from '../components/Good/Edit.vue'
+import AttrList from '../components/Good/AttributeList.vue'
 
 Vue.use(VueRouter);
 
@@ -89,6 +90,11 @@ export default new VueRouter({
 			name: 'good-banner',
 			path: '/good/banners',
 			component: GoodBannerList
-		}
+    },
+    {
+      name: 'good-attr',
+      path: '/good/attrList',
+      component: AttrList
+    }
 	]
 });
