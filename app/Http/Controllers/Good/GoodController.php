@@ -190,6 +190,12 @@ class GoodController extends Controller
       }
       $input = $this->array_remove( $request->input(),"good_type");
       $res = \DB::table($tabel_name)->insert($input);
+        $good = Good::find($request->good_id);
+        if ($request->good_type <= 1 && $good->thumbnail_img == '') {
+            $good->update([
+                'thumbnail_img' => $request->url
+            ]);
+        }
       if ($res) {
         return resJson([], 1, '添加成功');
       } else {
