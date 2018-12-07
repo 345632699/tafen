@@ -99,7 +99,7 @@
           <el-button
               size="mini"
               type="info"
-              @click="">查看
+              @click="getAttr(scope.$index, scope.row)">查看
           </el-button>
         </template>
       </el-table-column>
@@ -169,6 +169,9 @@
       },
 			getDetail (index,row) {
       	this.$router.push("/good/banners?good_id=" + row.uid)
+      },
+      getAttr (index, row) {
+        this.$router.push("/good/attrList?good_id=" + row.uid)
       },
       handleEdit(index, row) {
        this.$router.push('/good/edit?good_id=' + row.uid)
