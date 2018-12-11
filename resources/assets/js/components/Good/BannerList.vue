@@ -118,7 +118,7 @@
         <el-form-item label="图片更换" :label-width="formLabelWidth">
           <el-upload
               class="upload-demo"
-              action="http://www.tafen.com/good/upload"
+              action="https://www.tophena1982.com/good/upload"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
               :on-success="handleSuccess"
