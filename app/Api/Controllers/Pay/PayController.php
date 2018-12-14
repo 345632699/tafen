@@ -85,7 +85,7 @@ class PayController extends BaseController
                             "stock" => $good->stock - $order->quantity,
                             "already_sold" => $good->already_sold + $order->quantity
                         ]);
-                        $this->updateAchievement($client,$good->total_price);
+                        $this->updateAchievement($client,$line->total_price);
                     }
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
