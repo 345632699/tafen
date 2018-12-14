@@ -284,7 +284,7 @@ class PayController extends BaseController
         // 员工非员工 正常进行金钱统计 只有一条记录的时候才可能为 代理商品
         if ($order_lines->count() == 1) {
             $good_id = $order_lines[0]->good_id;
-            $last_price = $order_lines[0]->last_price;
+            $total_price = $order_lines[0]->total_price;
             $good_agent_type = Good::find($good_id)->agent_type_id;
             Log::info('$order_lines:' . $order_lines[0]->total_price);
             switch ($good_agent_type) {
@@ -356,11 +356,11 @@ class PayController extends BaseController
                     }
 
                     if ($rate > 0) {
-                        $spread_amount = $last_price * $rate;
+                        $spread_amount = $total_price * $rate;
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     }
                     // 上级存在 更新上级业绩
-                    $this->updateAchievement($parent, $last_price);
+                    $this->updateAchievement($parent, $total_price);
                     break;
             }
         } else {
