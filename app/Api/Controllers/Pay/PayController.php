@@ -89,13 +89,13 @@ class PayController extends BaseController
                     }
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
-                    }
-                    // 确定代理等级 根据代理等级进行计算
-                    // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师 4 领袖  10 为代理员工
-                    $client_agent_type = $client->agent_type_id;
-                    if ($good_agent_type > 0 && $good_agent_type > $client_agent_type) {
-                        //更新用户的代理等级
-                        $res = $client->update(['agent_type_id' => $good_agent_type]);
+                        // 确定代理等级 根据代理等级进行计算
+                        // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师 4 领袖  10 为代理员工
+                        $client_agent_type = $client->agent_type_id;
+                        if ($good_agent_type > 0 && $good_agent_type > $client_agent_type) {
+                          //更新用户的代理等级
+                          $res = $client->update(['agent_type_id' => $good_agent_type]);
+                        }
                     }
 
                     //判断逻辑 不应该写在这里  应与方法一同提取出去
