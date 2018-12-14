@@ -486,7 +486,9 @@ class PayController extends BaseController
     {
         try {
             $parent->update(['achievement' => $parent->achievement + $amount]);
-            if ($parent->achievement >= 300000 && $parent->agent_type_id < 3) {
+            if ($parent->achievement >= 76600 && $parent->achievement < 300000){
+              $parent->update(['agent_type_id' => 2]);
+            }elseif($parent->achievement >= 300000 && $parent->achievement < 500000) {
                 $parent->update(['agent_type_id' => 3]);
             } elseif ($parent->achievement >= 500000 && $parent->agent_type_id < 4) {
                 $parent->update(['agent_type_id' => 4]);
