@@ -358,9 +358,9 @@ class PayController extends BaseController
                     if ($rate > 0) {
                         $spread_amount = $last_price * $rate;
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
-                        // 上级存在 更新上级业绩
-                        $this->updateAchievement($parent, $last_price);
                     }
+                    // 上级存在 更新上级业绩
+                    $this->updateAchievement($parent, $last_price);
                     break;
             }
         } else {
@@ -384,6 +384,11 @@ class PayController extends BaseController
                     // 上级存在 更新上级业绩
                     $this->updateAchievement($parent, $order_line->total_price);
                 }
+            }else{
+              foreach ($order_lines as $order_line) {
+                // 上级存在 更新上级业绩
+                $this->updateAchievement($parent, $order_line->total_price);
+              }
             }
         }
     }
