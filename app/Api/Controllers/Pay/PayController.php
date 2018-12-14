@@ -39,22 +39,14 @@ class PayController extends BaseController
         $app = app('wechat.payment');
         $response = $app->handlePaidNotify(function ($message, $fail) {
             // 你的逻辑
-            Log::info("wechat-notify:".$message['out_trade_no']);
-            Log::info("wechat-notify-message:" . json_encode($message));
             file_put_contents(storage_path('logs/pay.log'),"支付单号：".$message['out_trade_no']."支付结果：".$message['return_code'].PHP_EOL,FILE_APPEND);
             $out_trade_no = $message['out_trade_no'];
             $pay_bills = \DB::table("pay_bills")->where('pay_order_number',$out_trade_no);
 //            传递parent_id
             if (!$pay_bills) { // 如果订单不存在
-                Log::info("========微信支付=========");
-                Log::error('Order not exist.'."订单号：".$out_trade_no);
-                Log::info("========微信支付=========");
                 return 'Order not exist.'; // 告诉微信，我已经处理完了，订单没找到，别再通知我了
             }
             if ($pay_bills->first()->pay_date) { // 假设订单字段“支付时间”不为空代表已经支付
-                Log::info("========微信支付=========");
-                Log::info('单字段“支付时间”不为空代表已经支付.'."订单号：".$out_trade_no);
-                Log::info("========微信支付=========");
                 return true; // 已经支付成功了就不再更新了
             }
 
@@ -63,11 +55,7 @@ class PayController extends BaseController
                 // 用户是否支付成功
                 if (array_get($message, 'result_code') === 'SUCCESS') {
                     $order = Order::find($pay_bills->first()->order_header_id);
-                    Log::info($order->toJson());
                     if (!$order){
-                        Log::info("========微信支付=========");
-                        Log::error('订单不存在.'."订单号：".$out_trade_no);
-                        Log::info("========微信支付=========");
                         return $fail('订单不存在');
                     }
                     $update = [
@@ -86,7 +74,7 @@ class PayController extends BaseController
                         Log::info("更新payBill成功,pid:".$parent_id."cid:".$client_id);
                         $this->client->updateTreeNode($client_id,$parent_id);
                     }
-
+                    $client = Client::find($client_id);
                     // 判断商品 是否代理商品
                     $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.total_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
@@ -97,21 +85,17 @@ class PayController extends BaseController
                             "stock" => $good->stock - $order->quantity,
                             "already_sold" => $good->already_sold + $order->quantity
                         ]);
+                        $this->updateAchievement($client,$good->total_price);
                     }
-                    Log::info("=========================更新等级==============");
                     if ($order_lines->count() == 1) {
                         $good_agent_type = Good::find($order_lines[0]->good_id)->agent_type_id;
                     }
                     // 确定代理等级 根据代理等级进行计算
                     // 1为一级芬赚达人 2 为芬赚高手 3 芬赚大师 4 领袖  10 为代理员工
-                    $client = Client::find($client_id);
                     $client_agent_type = $client->agent_type_id;
-                    Log::info("当前等级" . $client_agent_type);
-                    Log::info("购买的代理等级" . $good_agent_type);
                     if ($good_agent_type > 0 && $good_agent_type > $client_agent_type) {
                         //更新用户的代理等级
                         $res = $client->update(['agent_type_id' => $good_agent_type]);
-                        Log::info("更新用户等级" . $res . " " . $good_agent_type);
                     }
 
                     //判断逻辑 不应该写在这里  应与方法一同提取出去
@@ -143,23 +127,14 @@ class PayController extends BaseController
                     $orderUpdate['pay_date'] = Carbon::now();
                     $orderUpdate['order_status'] = 1;
                     $orderUpdateres = $order->update($orderUpdate);
-                    Log::info("========微信支付=========");
-                    Log::info('订单支付成功，更新状态:' . $orderUpdateres . "订单号：" . $out_trade_no);
-                    Log::info("========微信支付=========");
                     // 用户支付失败
                 } elseif (array_get($message, 'result_code') === 'FAIL') {
                     $update = [
                         'pay_status' => 2
                     ];
                     $res = $pay_bills->update($update);
-                    Log::info("========微信支付=========");
-                    Log::error('订单支付失败.'.$res."订单号：".$out_trade_no);
-                    Log::info("========微信支付=========");
                 }
             } else {
-                Log::info("========微信支付=========");
-                Log::error('通信失败，请稍后再通知我.'."订单号：".$out_trade_no);
-                Log::info("========微信支付=========");
                 return $fail('通信失败，请稍后再通知我');
             }
             file_put_contents(storage_path('logs/pay.log'),"支付单号：".$message['out_trade_no']."支付结果：".$message['return_code'].PHP_EOL,FILE_APPEND);
@@ -383,6 +358,8 @@ class PayController extends BaseController
                     if ($rate > 0) {
                         $spread_amount = $last_price * $rate;
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        // 上级存在 更新上级业绩
+                        $this->updateAchievement($parent, $last_price);
                     }
                     break;
             }
@@ -404,6 +381,8 @@ class PayController extends BaseController
                 foreach ($order_lines as $order_line) {
                     $spread_amount = $order_line->total_price * $rate;
                     $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line);
+                    // 上级存在 更新上级业绩
+                    $this->updateAchievement($parent, $order_line->total_price);
                 }
             }
         }
