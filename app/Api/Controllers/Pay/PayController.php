@@ -290,17 +290,17 @@ class PayController extends BaseController
             switch ($good_agent_type) {
                 case 1:
                     if ($parent->agent_type_id == 1) {
-                        $spread_amount = 5000;
+                        $spread_amount = 1;
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     } elseif ($parent->agent_type_id == 2) {
-                        $spread_amount = 5500;
+                        $spread_amount = 1;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
-                        $spread_amount = 6000;
+                        $spread_amount = 1;
                         // 更新冻结金额
                         $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
@@ -404,7 +404,7 @@ class PayController extends BaseController
         // 员工非员工 正常进行金钱统计 只有一条记录的时候才可能为 代理商品
         if ($order_lines->count() == 1) {
             $good_id = $order_lines[0]->good_id;
-            $last_price = $order_lines[0]->last_price;
+            $total_price = $order_lines[0]->total_price;
             $quantity = $order_lines[0]->quantity;
             $good_agent_type = Good::find($good_id)->agent_type_id;
             switch ($good_agent_type) {
@@ -422,7 +422,7 @@ class PayController extends BaseController
                     break;
                 default:
                     // 如果为销售员 根据业绩情况 统计回报率
-                    $spread_amount = $last_price * $quantity * $rate;
+                    $spread_amount = $total_price * $quantity * $rate;
                     $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                     break;
             }
@@ -479,7 +479,7 @@ class PayController extends BaseController
         foreach ($order_lines as $order_line) {
             $good_agent_type = Good::find($order_line->good_id)->agent_type_id;
             if ($good_agent_type == 0) {
-                $spread_amount = $order_line->last_price * $rate;
+                $spread_amount = $order_line->total_price * $rate;
                 $level = 2;
                 $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_line, $level);
             }

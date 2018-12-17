@@ -178,6 +178,7 @@ class HomeController extends BaseController
                 ->leftJoin('banner_images','banner_type_id','=','banner_type.id')
                 ->whereIn('banner_type.id',[1,2,3])
                 ->where('is_display',1)
+                ->orderBy('sort')
                 ->get();
         foreach ($allBanner as $banner){
             if ($banner->banner_type_id == 1){
