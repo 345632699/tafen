@@ -290,19 +290,21 @@ class PayController extends BaseController
             switch ($good_agent_type) {
                 case 1:
                     if ($parent->agent_type_id == 1) {
-                        $spread_amount = 1;
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        $spread_amount = 100;
+                        $amount = $order_lines[0]->total_price;
+                        // $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 2) {
-                        $spread_amount = 1;
+                        $spread_amount = 100;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        // $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
                     } elseif ($parent->agent_type_id == 3) {
-                        $spread_amount = 1;
+                        $spread_amount = 100;
                         // 更新冻结金额
-                        $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
+                        // $this->addFlowRecord($client_id, $parent_id, $spread_amount, $order_lines[0]);
                         // 更新业绩
                         $amount = $order_lines[0]->total_price;
                         $this->updateAchievement($parent, $amount);
