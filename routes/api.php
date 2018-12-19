@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/banner/update', 'Banner\BannerController@update');
     Route::post('/banner/delete', 'Banner\BannerController@deleteBanner');
     Route::get('/banner/list', 'Banner\BannerController@getList');
+    Route::get('/banner/typeList', 'Banner\BannerController@getBannerType');
 });
 Route::get('/good/getAttr', 'Good\GoodController@goodAttr');
 Route::post('/good/create', 'Good\GoodController@create');
