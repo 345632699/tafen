@@ -24,7 +24,7 @@
       <el-form-item label="广告图片">
         <el-upload
             class="upload-demo"
-            action="http://www.tafen.com/banner/upload"
+            action="http://www.tophena1982.com/banner/upload"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :on-success="handleSuccess"
