@@ -3,10 +3,9 @@
     <h1>背景图上传</h1>
     <el-form ref="form" :model="form" label-width="80px">
       <el-form-item label="背景类型">
-        <el-select v-model="form.banner_type_id" placeholder="请选择">
-          <el-option label="首页轮播图" value="1"></el-option>
-          <el-option label="优惠专区" value="2"></el-option>
-          <el-option label="芳疗课程" value="3"></el-option>
+        <el-select v-model="form.banner_type_id" placeholder="请选择" @change="typeChange">
+          <el-option v-for="item,index in banner_type_list" :key="index" :label="item.name"
+                     :value="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="是否展示">
@@ -50,6 +49,7 @@
       return {
         fileList2: [],
         good_list: '',
+        banner_type_list: '',
         scrfHeader: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
@@ -66,6 +66,9 @@
       };
     },
     methods: {
+      typeChange (e) {
+        this.uploadData.banner_type = e
+      },
       handleRemove(file, fileList) {
         console.log(file, fileList);
       },
@@ -105,6 +108,18 @@
       axios.get('/api/banner/goods').then(function (response) {
         if (response.data.status) {
           that.good_list = response.data.data
+        }
+      }).catch((err) => {
+        let res = err.response.data
+        if (res.message == "Unauthenticated.") {
+          // this.$router.push({path:'/login'})
+          window.location.href = '/login'
+        }
+        console.log(err.response.data);
+      });
+      axios.get('/api/banner/typeList').then(function (response) {
+        if (response.data.status) {
+          that.banner_type_list = response.data.data
         }
       }).catch((err) => {
         let res = err.response.data

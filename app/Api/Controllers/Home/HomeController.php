@@ -176,7 +176,6 @@ class HomeController extends BaseController
         //首页广告图
         $allBanner = \DB::table('banner_type')
                 ->leftJoin('banner_images','banner_type_id','=','banner_type.id')
-                ->whereIn('banner_type.id',[1,2,3])
                 ->where('is_display',1)
                 ->orderBy('sort')
                 ->get();
@@ -187,6 +186,8 @@ class HomeController extends BaseController
                 $resData['discount_banner'][] = $banner;
             }elseif ($banner->banner_type_id == 3){
                 $resData['chief_banner'][] = $banner;
+            } elseif ($banner->banner_type_id == 4) {
+                $resData['spread_banner'][] = $banner;
             }
         }
         //分类
