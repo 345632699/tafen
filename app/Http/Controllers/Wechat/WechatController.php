@@ -92,9 +92,12 @@ class WechatController extends Controller
 
     public function getClientFromOfficial(){
         $res = \DB::table("open_id_list")->orderBy('id','desc')->get()->first();
-        $nextOpenId = $res->open_id;
+        $lastOpenid = null;
+        if ($res != null){
+            $lastOpenid = $res->open_id;
+        }
         $app = app('wechat.official_account');
-        $users = $app->user->list($nextOpenId);
+        $users = $app->user->list($nextOpenId = $lastOpenid);
         if ($users['next_openid'] != null){
             $openIdList = $users['data']["openid"];
             $list = [];
@@ -112,6 +115,23 @@ class WechatController extends Controller
         }else{
             dd("暂无需要执行的内容");
         }
+    }
 
+    public function getUnionIdByOpenId(){
+        $lastItem = \DB::table('official_account')->orderBy('id','desc')->first();
+        $id = 0;
+        if ($lastItem != null){
+            $open_id = $lastItem->open_id;
+            $id = \DB::table("open_id_list")->where('open_id',$open_id)->first()->id;
+        }
+        $openIdArray = \DB::table('open_id_list')
+            ->select('open_id')
+            ->where('id','>',$id)
+            ->limit(100)
+            ->pluck('open_id')
+            ->toArray();
+        $app = app('wechat.official_account');
+        $users = $app->user->select($openIdArray);
+        dd($users);
     }
 }
