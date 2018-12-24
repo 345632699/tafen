@@ -144,7 +144,7 @@ class WechatController extends Controller
             foreach ($users["user_info_list"] as $user){
                 $list[] = [
                     'open_id' => $user['openid'],
-                    'unionid' => $user['unionid'],
+                    'union_id' => $user['unionid'],
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ];
