@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Wechat;
 
 use App\Model\Client;
 use App\Repositories\Client\ClientRepository;
+use Carbon\Carbon;
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -90,8 +91,27 @@ class WechatController extends Controller
     }
 
     public function getClientFromOfficial(){
+        $res = \DB::table("open_id_list")->orderBy('id','desc')->get()->first();
+        $nextOpenId = $res->open_id;
         $app = app('wechat.official_account');
-        $users = $app->user->list($nextOpenId = null);
-        dd($users);
+        $users = $app->user->list($nextOpenId);
+        if ($users['next_openid'] != null){
+            $openIdList = $users['data']["openid"];
+            $list = [];
+            foreach ($openIdList as $openId){
+                $list[] = [
+                    'open_id' => $openId,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
+            }
+            $res = \DB::table("open_id_list")->insert($list);
+            if ($res){
+                \Log::info("拉取OPENID执行完毕");
+            }
+        }else{
+            dd("暂无需要执行的内容");
+        }
+
     }
 }
