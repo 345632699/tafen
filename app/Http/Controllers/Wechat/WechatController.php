@@ -135,22 +135,25 @@ class WechatController extends Controller
     }
 
     public function insertAccount(){
-        $openIds = $this->getUnionIdByOpenId();
-        \Log::info(json_encode($openIds));
-        while (count($openIds) > 0){
-            $app = app('wechat.official_account');
-            $users = $app->user->select($openIds);
-            $list = [];
-            foreach ($users["user_info_list"] as $user){
-                $list[] = [
-                    'open_id' => $user['openid'],
-                    'union_id' => $user['unionid'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ];
+        while (1){
+            $openIds = $this->getUnionIdByOpenId();
+            \Log::info(json_encode($openIds));
+            if (count($openIds) > 0){
+                $app = app('wechat.official_account');
+                $users = $app->user->select($openIds);
+                $list = [];
+                foreach ($users["user_info_list"] as $user){
+                    $list[] = [
+                        'open_id' => $user['openid'],
+                        'union_id' => $user['unionid'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ];
+                }
+                \DB::table('official_account')->insert($list);
+            }else{
+                break;
             }
-            \DB::table('official_account')->insert($list);
-            $this->insertAccount();
         }
         echo "执行完毕";
         return;
