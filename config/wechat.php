@@ -94,8 +94,8 @@ return [
      */
     'mini_program' => [
         'default' => [
-            'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wx8caa43c266cc634b'),
-            'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', '3d5858c6bd9eb49dee7303c165cab853'),
+            'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wx309384160dc144df'),
+            'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', '02a4562f0532390395d8374da246a91e'),
             'token'   => env('WECHAT_MINI_PROGRAM_TOKEN', ''),
             'aes_key' => env('WECHAT_MINI_PROGRAM_AES_KEY', ''),
         ],
@@ -107,12 +107,12 @@ return [
     'payment' => [
         'default' => [
             'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
-            'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx8caa43c266cc634b'),
-            'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1509699081'),
-            'key'                => env('WECHAT_PAYMENT_KEY', 'ShenZhenHoneyBot20141225xiaomeng'),
+            'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx309384160dc144df'),
+            'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1515091301'),
+            'key'                => env('WECHAT_PAYMENT_KEY', 'tafen45152154dweffefre156herhet5'),
             'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', public_path('plugin/cert/apiclient_cert.pem')),
             'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', public_path('plugin/cert/apiclient_key.pem')),
-            'notify_url'         => 'https://wxapp.honeybot.cn/api/pay/notify',                           // 默认支付结果通知地址
+            'notify_url'         => 'https://www.tophena1982.com/api/pay/notify',                           // 默认支付结果通知地址
         ],
         // ...
     ],
