@@ -32,8 +32,10 @@ class WechatController extends Controller
         $app = app('wechat.mini_program');
         $res = $app->auth->session($code);
         $decryptedData = $app->encryptor->decryptData($res['session_key'], $iv, $encryptedData);
-
+        \Log::info("decryptedData解密信息===========================");
+        \Log::info(json_encode($decryptedData));
         $openId = $decryptedData['openId'];
+        $unionId = $decryptedData['unionId'];
 
         $client = Client::where('open_id',$openId)->first();
         if (!$client){
@@ -43,6 +45,7 @@ class WechatController extends Controller
                 'password' => bcrypt("admin123"),
                 'avatar_url' => $decryptedData['avatarUrl'],
                 'open_id' => $decryptedData['openId'],
+                'union_id' => $decryptedData['unionId'],
                 'gender' => $decryptedData['gender'],
                 'parent_id' => $parent_id,
             ];
@@ -56,6 +59,11 @@ class WechatController extends Controller
             ];
             \DB::table('client_amount')->insert($amount);
         } else {
+            if ($client->union_id == null){
+                Client::where('open_id', $openId)->update([
+                    'union_id' => $unionId
+                ]);
+            }
             if ($client->parent_id == 0 && $parent_id > 0) {
                 Client::where('open_id', $openId)->update([
                     'parent_id' => $parent_id
@@ -79,5 +87,11 @@ class WechatController extends Controller
             $filename = $response->saveAs(public_path('qrcode'), 'appcode.png');
             dd($filename);
         }
+    }
+
+    public function getClientFromOfficial(){
+        $app = app('wechat.official_account');
+        $users = $app->user->list($nextOpenId = null);
+        dd($users);
     }
 }
