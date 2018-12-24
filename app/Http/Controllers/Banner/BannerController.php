@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Mockery\Exception;
 const BANNER_TYPE_PATH = [
-    'home', 'discount', 'lesson'
+    'home', 'discount', 'lesson', 'spread'
 ];
 class BannerController extends Controller
 {
@@ -40,6 +40,12 @@ class BannerController extends Controller
         } catch (Exception $e) {
             return resJson([], 0, $e->getMessage());
         }
+    }
+
+    public function getBannerType()
+    {
+        $banner_type_list = \DB::table('banner_type')->get();
+        return resJson($banner_type_list);
     }
 
     public function getList()
