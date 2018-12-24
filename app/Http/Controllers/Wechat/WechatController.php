@@ -137,7 +137,7 @@ class WechatController extends Controller
     public function insertAccount(){
         $openIds = $this->getUnionIdByOpenId();
         \Log::info(json_encode($openIds));
-        while ($openIds){
+        while ($openIds != null){
             $app = app('wechat.official_account');
             $users = $app->user->select($openIds);
             $list = [];
