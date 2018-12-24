@@ -152,5 +152,6 @@ class WechatController extends Controller
             \DB::table('official_account')->insert($list);
             $this->insertAccount();
         }
+        echo "执行完毕";
     }
 }
