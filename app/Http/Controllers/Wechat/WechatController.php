@@ -9,6 +9,7 @@ use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use JWTAuth;
+use function Sodium\increment;
 
 class WechatController extends Controller
 {
@@ -130,8 +131,26 @@ class WechatController extends Controller
             ->limit(100)
             ->pluck('open_id')
             ->toArray();
-        $app = app('wechat.official_account');
-        $users = $app->user->select($openIdArray);
-        dd($users);
+        return $openIdArray;
+    }
+
+    public function insertAccount(){
+        $openIds = $this->getUnionIdByOpenId();
+        \Log::info(json_encode($openIds));
+        while ($openIds){
+            $app = app('wechat.official_account');
+            $users = $app->user->select($openIds);
+            $list = [];
+            foreach ($users["user_info_list"] as $user){
+                $list[] = [
+                    'open_id' => $user['openid'],
+                    'unionid' => $user['unionid'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
+            }
+            \DB::table('official_account')->insert($list);
+            $this->insertAccount();
+        }
     }
 }

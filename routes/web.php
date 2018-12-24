@@ -34,7 +34,7 @@ Route::group(['middleware' => ['web']], function () {
 
 Route::any('getUnionId','Wechat\WechatController@mini');
 Route::any('getUsers','Wechat\WechatController@getClientFromOfficial');
-Route::any('pullUserList','Wechat\WechatController@getUnionIdByOpenId');
+Route::any('pullUserList','Wechat\WechatController@insertAccount');
 Route::any('getQrcode', 'Wechat\WechatController@getQrcode');
 Route::any('home', '\App\Api\Controllers\Home\HomeController@index');
 Route::any('category_gppds','\App\Api\Controllers\Goods\GoodController@categoryGoodsList');
