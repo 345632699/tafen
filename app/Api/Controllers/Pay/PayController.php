@@ -587,30 +587,23 @@ class PayController extends BaseController
 
     // 公众号模版消息推送
     public function sendOfficialMsg($client_id, $order, $pay_bills){
-        $union_id = Client::find($client_id)->union_id;
-        $official_account = DB::table('official_account')->where('union_id',$union_id)->first();
-        if (count($official_account) > 0){
-            $oepn_id = $official_account->open_id;
-        }else{
-            return;
-        }
+       $official_client_openid = findOfficialOpenid($client_id);
+       if ($official_client_openid == null){
+           return;
+       }
         $official_app = app('wechat.official_account');
         $sendData = [
-            'touser' => $oepn_id,
-            'template_id' => 'IylQgK3QkoX2Jn5VrDGcrTC-jprXO6wRNpci9alVfls',
+            'touser' => $official_client_openid,
+            'template_id' => 'FU9Wo8VSUktqsZbwZttbmcgRJGxSm6A16UzakK7CAsM',
             'page' => 'index',
             'form_id' => $pay_bills->prepay_id,
             'data' => [
-                'keyword1' => $pay_bills->transaction_id,
-                'keyword2' => $pay_bills->total_fee / 100 . "元",
-                'keyword3' => $order->created_at,
-                'keyword4' => $pay_bills->name,
-                'keyword5' => $pay_bills->uid,
-                'keyword6' => $pay_bills->pay_date,
-                'keyword7' => $pay_bills->total_price / 100 . "元",
-                'keyword8' => '已受理',
-                'keyword9' => $order->order_number,
-                'keyword10' => $pay_bills->name,
+                'first' => "尊敬顾客，你在门店成功消费：",
+                'keyword1' => $order->created_at,
+                'keyword2' => "她芬商城",
+                'keyword3' => $pay_bills->name,
+                'keyword4' => $pay_bills->total_price / 100 . "元",
+                'remark' => "感谢您的支持！"
             ],
         ];
         Log::info('===发送模板信息===sendData', $sendData);
