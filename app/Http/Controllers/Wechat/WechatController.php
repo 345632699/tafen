@@ -168,7 +168,10 @@ class WechatController extends Controller
             $sendData = [
                 'touser' => $official_parent_oepnid,
                 'template_id' => '2NiEIVPTxnuw-8EGXxAKpwomavdF5QSF67yT6xvVGQA',
-                'path' => 'index',
+                'miniprogram' => [
+                    'appid'=> "wx309384160dc144df",
+                    "path" => "main/main"
+                ],
                 'data' => [
                     'first' => '您好，'.$client->nick_name.'已经成为你的会员。',
                     'type' => "商户",

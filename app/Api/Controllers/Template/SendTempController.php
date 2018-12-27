@@ -5,9 +5,7 @@ namespace App\Api\Controllers\Template;
 use App\Api\Controllers\BaseController;
 use App\Model\Client;
 use App\Model\Good;
-use EasyWeChat\Payment\Application;
-use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 
 class SendTempController extends BaseController
 {
@@ -36,14 +34,14 @@ class SendTempController extends BaseController
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
                 'miniprogram' => [
                     'appid'=> "wx309384160dc144df",
-                    "pagepath" => "main/main"
+                    "path" => "main/main"
                 ],
                 'data' => [
                     'first' => '恭喜您的'.$level.'下线' . $client->nick_name . '下单成功。',
                     'keyword1' => "她芬上次就鞥",
                     'keyword2' => rtrim($good_name, ",") ,
-                    'keyword3' => rtrim($order_price,','),
-                    'keyword4' => $order_lines[0]->created_at,
+                    'keyword3' => Carbon::now(),
+                    'keyword4' =>  rtrim($order_price,','),
                     'keyword5' => "已付款",
                     'remark' => "更多优惠项目，详情咨询客服"
                 ],
@@ -58,15 +56,15 @@ class SendTempController extends BaseController
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
                 'miniprogram' => [
                     'appid'=> "wx309384160dc144df",
-                    "pagepath" => "main/main"
+                    "path" => "main/main"
                 ],
                 'data' => [
                     'first' => '恭喜' . $client->nick_name . '下单成功。',
                     'keyword1' => "她芬精油",
-                    'keyword2' => $good_num,
-                    'keyword3' => $order_price,
-                    'keyword4' => $order_lines[0]->created_at,
-                    'keyword5' => "包邮",
+                    'keyword2' => rtrim($good_name, ",") ,
+                    'keyword3' => Carbon::now(),
+                    'keyword4' => rtrim($order_price,','),
+                    'keyword5' => "已付款",
                     'remark' => "更多优惠项目，详情咨询客服"
                 ]
             ];

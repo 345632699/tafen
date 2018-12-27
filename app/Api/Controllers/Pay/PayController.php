@@ -598,7 +598,7 @@ class PayController extends BaseController
             'template_id' => 'FU9Wo8VSUktqsZbwZttbmcgRJGxSm6A16UzakK7CAsM',
             'miniprogram' => [
                 'appid'=> "wx309384160dc144df",
-                "pagepath" => "main/main"
+                "path" => "main/main"
             ],
             'form_id' => $pay_bills->prepay_id,
             'data' => [
