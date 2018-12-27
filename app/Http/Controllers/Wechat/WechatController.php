@@ -163,25 +163,21 @@ class WechatController extends Controller
 
     public function sendTemp($client = null,$parent_id = null){
         $official_app = app('wechat.official_account');
-//        $parent = Client::find($parent_id);
-//        $official_parent = \DB::table('official_account')->where('union_id',$parent->union_id)->first();
-        $official_parent_oepnid = findOfficialOpenid(4);
-        $client = Client::find(4);
+        $official_parent_oepnid = findOfficialOpenid($parent_id);
         if ($official_parent_oepnid != null){
-            $official_parent_oepnid = $official_app->open_id;
             $sendData = [
                 'touser' => $official_parent_oepnid,
                 'template_id' => '2NiEIVPTxnuw-8EGXxAKpwomavdF5QSF67yT6xvVGQA',
                 'path' => 'index',
                 'data' => [
-                    'first' => '您好，'+ $client->nick_name +'已经成为你的会员。',
+                    'first' => '您好，'.$client->nick_name.'已经成为你的会员。',
                     'type' => "商户",
                     'address' => "她芬商城",
                     'cardNumber' => $client->id,
                     'VIPName' => $client->nick_name,
                     'VIPPhone' => "无",
                     'expDate' => "长期有效",
-                    'remark' =>"感谢您的消费，点击下方详情进行评价"
+                    'remark' =>"感谢您的努力，点击下方查看详情"
                 ],
             ];
             \Log::info('===发送模板信息===sendData', $sendData);
