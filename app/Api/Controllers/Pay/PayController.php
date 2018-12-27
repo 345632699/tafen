@@ -3,6 +3,7 @@
 namespace App\Api\Controllers\Pay;
 
 use App\Api\Controllers\BaseController;
+use App\Api\Controllers\Template\SendTempController;
 use App\Model\Client;
 use App\Model\Good;
 use App\Model\Order;
@@ -21,10 +22,11 @@ use Mockery\Exception;
 class PayController extends BaseController
 {
 
-    public function __construct(ClientRepository $client,PayRepository $pay)
+    public function __construct(ClientRepository $client,PayRepository $pay,SendTempController $sendTempController)
     {
         $this->client = $client;
         $this->pay = $pay;
+        $this->sendTemp = $sendTempController;
     }
 
     public function index() {
@@ -395,6 +397,7 @@ class PayController extends BaseController
               }
             }
         }
+        $this->sendTemp->newOrder($order_lines,$client_id,$parent_id);
     }
 
     // 更新上一级的余额 员工 agent_type_id > 3
