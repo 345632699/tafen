@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class SendTempController extends BaseController
 {
-    public function newOrder($order_lines, $client_id, $parent_id)
+    public function newOrder($order_lines, $client_id, $parent_id,$type = 0)
     {
         $official_app = app('wechat.official_account');
         $official_parent_oepnid = findOfficialOpenid($parent_id);
@@ -26,6 +26,11 @@ class SendTempController extends BaseController
             $order_price .= Good::find($order_line->good_id)->first()->name . ":" . ($order_line->total_price / 100) . "元,";
         }
         if ($official_parent_oepnid != null) {
+            if ($type > 0){
+                $level = "二级";
+            }else{
+                $level = "一级";
+            }
             $sendData = [
                 'touser' => $official_parent_oepnid,
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
@@ -34,7 +39,7 @@ class SendTempController extends BaseController
                     "pagepath" => "main/main"
                 ],
                 'data' => [
-                    'first' => '恭喜您的下线' . $client->nick_name . '下单成功。',
+                    'first' => '恭喜您的'.$level.'下线' . $client->nick_name . '下单成功。',
                     'keyword1' => "她芬上次就鞥",
                     'keyword2' => rtrim($good_name, ",") ,
                     'keyword3' => rtrim($order_price,','),
@@ -47,7 +52,7 @@ class SendTempController extends BaseController
             $res = $official_app->template_message->send($sendData);
             \Log::info('===发送模板信息===resData' . json_encode($res));
         }
-        if ($official_client_oepnid != null) {
+        if ($official_client_oepnid != null && $type == 0) {
             $sendData = [
                 'touser' => $official_client_oepnid,
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',

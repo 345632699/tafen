@@ -470,6 +470,7 @@ class PayController extends BaseController
                     }
                 }
             }
+            $this->sendTemp->newOrder($order_lines,$client_id,$parent_id,1);
         } catch (Exception $e) {
             Log::error('更新二级提成出错' . $e->getMessage());
         }
