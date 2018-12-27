@@ -71,6 +71,8 @@ class PayController extends BaseController
                         $client_id = $pay_bills->first()->client_id;
                         // 发送模板消息
                         $this->sendTempMsg($client_id, $order, $pay_bills->first());
+                        // 发送公众号模版消息
+                        $this->sendOfficialMsg($client_id, $order, $pay_bills->first());
                         Log::info("更新payBill成功,pid:".$parent_id."cid:".$client_id);
                         $this->client->updateTreeNode($client_id,$parent_id);
                     }
@@ -577,6 +579,39 @@ class PayController extends BaseController
         ];
         Log::info('===发送模板信息===sendData', $sendData);
         $res = $minapp->template_message->send($sendData);
+        Log::info('===发送模板信息===resData' . json_encode($res));
+    }
+
+    // 公众号模版消息推送
+    public function sendOfficialMsg($client_id, $order, $pay_bills){
+        $union_id = Client::find($client_id)->union_id;
+        $official_account = DB::table('official_account')->where('union_id',$union_id)->first();
+        if (count($official_account) > 0){
+            $oepn_id = $official_account->open_id;
+        }else{
+            return;
+        }
+        $official_app = app('wechat.official_account');
+        $sendData = [
+            'touser' => $oepn_id,
+            'template_id' => 'IylQgK3QkoX2Jn5VrDGcrTC-jprXO6wRNpci9alVfls',
+            'page' => 'index',
+            'form_id' => $pay_bills->prepay_id,
+            'data' => [
+                'keyword1' => $pay_bills->transaction_id,
+                'keyword2' => $pay_bills->total_fee / 100 . "元",
+                'keyword3' => $order->created_at,
+                'keyword4' => $pay_bills->name,
+                'keyword5' => $pay_bills->uid,
+                'keyword6' => $pay_bills->pay_date,
+                'keyword7' => $pay_bills->total_price / 100 . "元",
+                'keyword8' => '已受理',
+                'keyword9' => $order->order_number,
+                'keyword10' => $pay_bills->name,
+            ],
+        ];
+        Log::info('===发送模板信息===sendData', $sendData);
+        $res = $official_app->template_message->send($sendData);
         Log::info('===发送模板信息===resData' . json_encode($res));
     }
 }

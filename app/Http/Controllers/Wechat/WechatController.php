@@ -158,4 +158,23 @@ class WechatController extends Controller
         echo "执行完毕";
         return;
     }
+
+    public function sendTemp(){
+        $official_app = app('wechat.official_account');
+        $sendData = [
+            'touser' => "oUTQyswWsw09kXBaeSkWcfaOAXTY",
+            'template_id' => 'x_4Kb4qEAbRM9M93wIR8pV8LKL2g4zJ_0KZiN4EGHjQ',
+            'url' => 'https://www.baidu.com',
+            'data' => [
+                'first' => '尊敬的张先生，您的消费详情如下',
+                'keyword1' => "上海静安店",
+                'keyword2' => '2015年9月24日 18点30分',
+                'keyword3' => "面部护理",
+                'remark' =>"感谢您的消费，点击下方详情进行评价"
+            ],
+        ];
+        \Log::info('===发送模板信息===sendData', $sendData);
+        $res = $official_app->template_message->send($sendData);
+        \Log::info('===发送模板信息===resData' . json_encode($res));
+    }
 }
