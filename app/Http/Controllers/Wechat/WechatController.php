@@ -161,11 +161,12 @@ class WechatController extends Controller
         return;
     }
 
-    public function sendTemp($client,$parent_id){
+    public function sendTemp($client = null,$parent_id = null){
         $official_app = app('wechat.official_account');
 //        $parent = Client::find($parent_id);
 //        $official_parent = \DB::table('official_account')->where('union_id',$parent->union_id)->first();
         $official_parent_oepnid = findOfficialOpenid(4);
+        $client = Client::find(4);
         if ($official_parent_oepnid != null){
             $official_parent_oepnid = $official_app->open_id;
             $sendData = [
