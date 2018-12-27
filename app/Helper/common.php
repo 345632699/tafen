@@ -50,7 +50,7 @@ function resJson($data, $status = 1, $msg = 'success')
 
 function findOfficialOpenid($client_id){
     $client = \App\Client::find($client_id);
-    $official_parent = \DB::table('official_account')->where('union_id',$client->union_id)->first();
+    $official_parent = \DB::table('official_account')->where('union_id',$client->union_id)->get()->toArray();
     if (count($official_parent) > 0){
         return $official_parent->open_id;
     }else{
