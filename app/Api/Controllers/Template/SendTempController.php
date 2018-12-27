@@ -34,11 +34,11 @@ class SendTempController extends BaseController
                 'path' => 'index',
                 'data' => [
                     'first' => '恭喜您的下线' . $client->nick_name . '下单成功。',
-                    'keyword1' => $good_name,
-                    'keyword2' => $good_num,
-                    'keyword3' => $order_price,
+                    'keyword1' => "她芬上次就鞥",
+                    'keyword2' => rtrim($good_name, ",") ,
+                    'keyword3' => rtrim($order_price,','),
                     'keyword4' => $time,
-                    'keyword5' => "包邮",
+                    'keyword5' => "已付款",
                     'remark' => "更多优惠项目，详情咨询客服"
                 ],
             ];
@@ -53,7 +53,7 @@ class SendTempController extends BaseController
                 'path' => 'index',
                 'data' => [
                     'first' => '恭喜' . $client->nick_name . '下单成功。',
-                    'keyword1' => $good_name,
+                    'keyword1' => "她芬精油",
                     'keyword2' => $good_num,
                     'keyword3' => $order_price,
                     'keyword4' => $time,
