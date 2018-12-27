@@ -595,7 +595,10 @@ class PayController extends BaseController
         $sendData = [
             'touser' => $official_client_openid,
             'template_id' => 'FU9Wo8VSUktqsZbwZttbmcgRJGxSm6A16UzakK7CAsM',
-            'page' => 'index',
+            'miniprogram' => [
+                'appid'=> "wx309384160dc144df",
+                "pagepath" => "main/main"
+            ],
             'form_id' => $pay_bills->prepay_id,
             'data' => [
                 'first' => "尊敬顾客，你在门店成功消费：",

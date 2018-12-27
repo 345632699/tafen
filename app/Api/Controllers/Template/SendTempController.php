@@ -20,24 +20,25 @@ class SendTempController extends BaseController
         $good_name = ''; //产品名称
         $good_num = ''; //产品数量
         $order_price = ''; //产品数量
-        $time = ''; //产品数量
         foreach ($order_lines as $order_line) {
             $good_name .= Good::find($order_line->good_id)->first()->name . ",";
             $good_num .= Good::find($order_line->good_id)->first()->name . "x" . $order_line->quantity . ",";
             $order_price .= Good::find($order_line->good_id)->first()->name . ":" . ($order_line->total_price / 100) . "元,";
-            $time = $order_line->created_at;
         }
         if ($official_parent_oepnid != null) {
             $sendData = [
                 'touser' => $official_parent_oepnid,
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
-                'path' => 'index',
+                'miniprogram' => [
+                    'appid'=> "wx309384160dc144df",
+                    "pagepath" => "main/main"
+                ],
                 'data' => [
                     'first' => '恭喜您的下线' . $client->nick_name . '下单成功。',
                     'keyword1' => "她芬上次就鞥",
                     'keyword2' => rtrim($good_name, ",") ,
                     'keyword3' => rtrim($order_price,','),
-                    'keyword4' => $time,
+                    'keyword4' => $order_lines[0]->created_at,
                     'keyword5' => "已付款",
                     'remark' => "更多优惠项目，详情咨询客服"
                 ],
@@ -50,13 +51,16 @@ class SendTempController extends BaseController
             $sendData = [
                 'touser' => $official_client_oepnid,
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
-                'path' => 'index',
+                'miniprogram' => [
+                    'appid'=> "wx309384160dc144df",
+                    "pagepath" => "main/main"
+                ],
                 'data' => [
                     'first' => '恭喜' . $client->nick_name . '下单成功。',
                     'keyword1' => "她芬精油",
                     'keyword2' => $good_num,
                     'keyword3' => $order_price,
-                    'keyword4' => $time,
+                    'keyword4' => $order_lines[0]->created_at,
                     'keyword5' => "包邮",
                     'remark' => "更多优惠项目，详情咨询客服"
                 ]
