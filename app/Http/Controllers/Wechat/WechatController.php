@@ -53,6 +53,8 @@ class WechatController extends Controller
             ];
             $client = Client::create($newUser);
             $this->client->updateTreeNode($client->id, $parent_id);
+            // 发送发展下线的模版消息
+            $this->sendTemp($client,$parent_id);
             // 创建资金账户
             $amount = [
                 'client_id' => $client->id,
@@ -159,22 +161,32 @@ class WechatController extends Controller
         return;
     }
 
-    public function sendTemp(){
+    public function sendTemp($client,$parent_id){
         $official_app = app('wechat.official_account');
-        $sendData = [
-            'touser' => "oUTQyswWsw09kXBaeSkWcfaOAXTY",
-            'template_id' => 'x_4Kb4qEAbRM9M93wIR8pV8LKL2g4zJ_0KZiN4EGHjQ',
-            'url' => 'https://www.baidu.com',
-            'data' => [
-                'first' => '尊敬的张先生，您的消费详情如下',
-                'keyword1' => "上海静安店",
-                'keyword2' => '2015年9月24日 18点30分',
-                'keyword3' => "面部护理",
-                'remark' =>"感谢您的消费，点击下方详情进行评价"
-            ],
-        ];
-        \Log::info('===发送模板信息===sendData', $sendData);
-        $res = $official_app->template_message->send($sendData);
-        \Log::info('===发送模板信息===resData' . json_encode($res));
+//        $parent = Client::find($parent_id);
+//        $official_parent = \DB::table('official_account')->where('union_id',$parent->union_id)->first();
+        $official_parent_oepnid = findOfficialOpenid(4);
+        if ($official_parent_oepnid != null){
+            $official_parent_oepnid = $official_app->open_id;
+            $sendData = [
+                'touser' => $official_parent_oepnid,
+                'template_id' => '2NiEIVPTxnuw-8EGXxAKpwomavdF5QSF67yT6xvVGQA',
+                'path' => 'index',
+                'data' => [
+                    'first' => '您好，'+ $client->nick_name +'已经成为你的会员。',
+                    'type' => "商户",
+                    'address' => "她芬商城",
+                    'cardNumber' => $client->id,
+                    'VIPName' => $client->nick_name,
+                    'VIPPhone' => "无",
+                    'expDate' => "长期有效",
+                    'remark' =>"感谢您的消费，点击下方详情进行评价"
+                ],
+            ];
+            \Log::info('===发送模板信息===sendData', $sendData);
+            $res = $official_app->template_message->send($sendData);
+            \Log::info('===发送模板信息===resData' . json_encode($res));
+        }
+
     }
 }
