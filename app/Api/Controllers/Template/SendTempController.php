@@ -48,7 +48,7 @@ class SendTempController extends BaseController
         }
         if ($official_client_oepnid != null) {
             $sendData = [
-                'touser' => $official_parent_oepnid,
+                'touser' => $official_client_oepnid,
                 'template_id' => '8QBuwuBrqHVJ935lVo3dJ5egO31i_m1XItEww7BCGns',
                 'path' => 'index',
                 'data' => [
