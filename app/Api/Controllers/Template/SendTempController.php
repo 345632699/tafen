@@ -38,7 +38,7 @@ class SendTempController extends BaseController
                 ],
                 'data' => [
                     'first' => '恭喜您的'.$level.'下线' . $client->nick_name . '下单成功。',
-                    'keyword1' => "她芬上次就鞥",
+                    'keyword1' => "她芬精油",
                     'keyword2' => rtrim($good_name, ",") ,
                     'keyword3' => Carbon::now(),
                     'keyword4' =>  rtrim($order_price,','),
