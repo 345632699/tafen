@@ -189,4 +189,52 @@ class WechatController extends Controller
         }
 
     }
+    public function getNeWId(){
+        $app = app('wechat.official_account');
+        $next_openid = null;
+        while (1){
+            $users = $app->user->list($nextOpenId = $next_openid);
+            if ($users['next_openid'] != null){
+                $openIdList = $users['data']["openid"];
+                $exist_openIdList = \DB::table('open_id_list')->pluck("open_id")->toArray();
+                $arr = array_diff($openIdList,$exist_openIdList);
+                foreach ($arr as $openId){
+                    $list[] = [
+                        'open_id' => $openId,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ];
+                }
+                \DB::table("open_id_list")->insert($list);
+                $next_openid = $users['next_openid'];
+            }else{
+                \Log::info("拉取OPENID执行完毕");
+                break;
+            }
+        }
+    }
+
+    //全表更新
+    public function updateAllOfficialInfo() {
+        try{
+            \DB::table('open_id_list')->truncate();
+            \DB::table('official_account')->truncate();
+            $this->getClientFromOfficial();
+            $this->insertAccount();
+            return resJson([],1,'成功');
+        }catch (\Exception $e){
+            return resJson([],0,$e->getMessage());
+        }
+    }
+
+    //部分更新
+    public function updatelOfficialInfo() {
+        try{
+            $this->getNeWId();
+            $this->insertAccount();
+            return resJson([],1,'成功');
+        }catch (\Exception $e){
+            return resJson([],0,$e->getMessage());
+        }
+    }
 }

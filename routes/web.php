@@ -37,6 +37,11 @@ Route::any('getUnionId','Wechat\WechatController@mini');
 Route::any('getUsers','Wechat\WechatController@getClientFromOfficial');
 Route::any('pullUserList','Wechat\WechatController@insertAccount');
 
+// 全更新
+Route::get('updateAllOfficial','Wechat\WechatController@updateAllOfficialInfo');
+//部分更新
+Route::get('updateOfficial','Wechat\WechatController@updatelOfficialInfo');
+
 Route::get('sendTemp','Wechat\WechatController@sendTemp');
 
 Route::any('getQrcode', 'Wechat\WechatController@getQrcode');

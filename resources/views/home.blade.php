@@ -27,6 +27,14 @@
                         <br>
                         <a href="/#/good/good-list">商品列表</a>
                     </div>
+                    <div class="panel-body">
+                        <a href="/updateAllOfficial">
+                            <button class="btn btn-primary">公众号全更新</button>
+                        </a>
+                        <a href="/updateOfficial">
+                            <button class="btn btn-primary">公众号部分更新</button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
