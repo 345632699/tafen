@@ -198,6 +198,7 @@ class WechatController extends Controller
                 $openIdList = $users['data']["openid"];
                 $exist_openIdList = \DB::table('open_id_list')->pluck("open_id")->toArray();
                 $arr = array_diff($openIdList,$exist_openIdList);
+                $list = [];
                 foreach ($arr as $openId){
                     $list[] = [
                         'open_id' => $openId,
