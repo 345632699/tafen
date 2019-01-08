@@ -83,7 +83,6 @@ class PayController extends BaseController
                     $order_lines = Order::select('ol.good_id', 'ol.last_price', 'ol.total_price', 'ol.quantity', 'ol.uid', 'ol.header_id')
                         ->rightJoin('order_lines as ol', 'ol.header_id', '=', 'order_headers.uid')
                         ->where('order_headers.uid', $order->uid)->get();
-                    \Log::info("order_lines: =========================".json_encode($order_lines));
                     foreach ($order_lines as $line) {
                         $good = Good::find($line->good_id);
                         $good->update([
