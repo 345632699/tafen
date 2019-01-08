@@ -19,9 +19,11 @@ class SendTempController extends BaseController
         $good_num = ''; //产品数量
         $order_price = ''; //产品数量
         foreach ($order_lines as $order_line) {
-            $good_name .= Good::find($order_line->good_id)->first()->name . ",";
-            $good_num .= Good::find($order_line->good_id)->first()->name . "x" . $order_line->quantity . ",";
-            $order_price .= Good::find($order_line->good_id)->first()->name . ":" . ($order_line->total_price / 100) . "元,";
+            \Log::info("order_line: =========================",json_encode($order_line));
+            $name = Good::find($order_line->good_id)->first()->name;
+            $good_name .= $name . ",";
+            $good_num .= $name . "x" . $order_line->quantity . ",";
+            $order_price .= $name . ":" . ($order_line->total_price / 100) . "元,";
         }
         if ($official_parent_oepnid != null) {
             if ($type > 0){
