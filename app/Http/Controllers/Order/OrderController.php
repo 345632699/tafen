@@ -28,7 +28,9 @@ class OrderController extends Controller
             ->leftJoin('order_lines as ol','order_headers.uid','=','ol.header_id')
             ->leftJoin('goods','goods.uid','=','ol.good_id')
             ->leftJoin('clients','clients.id','=','order_headers.client_id')
-            ->where($where)->paginate($limit);
+            ->where($where)
+            ->orderBy('created_at','desc')
+            ->paginate($limit);
         foreach($orderList as $order){
             //订单状态，见xm_lookup_values表ORDER_STATUS：0-已下单，1-已支付，2-待发货，3-已发货，4-已完成，5-异常，6-申请退货，7-确认退货，8-已退货
             $order_status = $order->order_status;

@@ -6,8 +6,21 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">订单列表</div>
-
                     <div class="panel-body">
+                        <label for="">订单状态选择：</label>
+                        <a href="/order?order_status=1">
+                            <button class="btn btn-success">待发货</button>
+                        </a>
+                        <a href="/order?order_status=0">
+                            <button class="btn btn-danger">未支付</button>
+                        </a>
+                        <a href="/order?order_status=9">
+                            <button class="btn btn-info">已取消</button>
+                        </a>
+                        <a href="/order?order_status=6">
+                            <button class="btn btn-default">申请退货</button>
+                        </a>
+                        <hr>
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>
