@@ -19,7 +19,7 @@ class SendTempController extends BaseController
         $good_num = ''; //产品数量
         $order_price = ''; //产品数量
         foreach ($order_lines as $order_line) {
-            \Log::info("order_line: =========================",json_encode($order_line));
+            \Log::info("order_line: =========================".json_encode($order_line));
             $name = Good::find($order_line->good_id)->first()->name;
             $good_name .= $name . ",";
             $good_num .= $name . "x" . $order_line->quantity . ",";
